@@ -1,0 +1,14 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:12
+    container_name: icebreaker_postgres
+    restart: unless-stopped
+    ports:
+      - "12000:5432"
+    environment:
+      - POSTGRES_DB=icebreaker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
