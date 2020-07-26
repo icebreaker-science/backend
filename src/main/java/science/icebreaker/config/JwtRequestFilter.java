@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.List;
 
 
+/**
+ * Please refer to {@link SecurityConfig} for an overview of the security concept.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -38,6 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     /**
      * If the "Authorization" header is present, this function will extract the JWT token and validate it. If the
      * validation is successful, the account and the roles of the user will be loaded and added to the security context.
+     * If not, it will throw exceptions (see {@link JwtTokenValidationService#validateJwtToken}.
      */
     @Override
     protected void doFilterInternal(

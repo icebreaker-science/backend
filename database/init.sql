@@ -16,7 +16,7 @@ CREATE TABLE account_role (
 
 CREATE INDEX account_role_email_index ON account_role (email);
 
-CREATE TABLE profile (
+CREATE TABLE account_profile (
   account_id INTEGER PRIMARY KEY,
   title TEXT,
   forename TEXT NOT NULL,

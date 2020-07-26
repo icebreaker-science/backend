@@ -9,12 +9,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import science.icebreaker.config.SecurityConfig;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * Please refer to {@link SecurityConfig} for an overview of the security concept.
+ */
 @Service
 public class AccountService {
 
@@ -22,7 +26,7 @@ public class AccountService {
 
     private final AccountRoleRepository accountRoleRepository;
 
-    private final ProfileRepository profileRepository;
+    private final AccountProfileRepository accountProfileRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -36,14 +40,14 @@ public class AccountService {
     public AccountService(
             AccountRepository accountRepository,
             AccountRoleRepository accountRoleRepository,
-            ProfileRepository profileRepository,
+            AccountProfileRepository accountProfileRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             @Value("${icebreaker.jwt-secret}") String jwtSecret,
             @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
-        this.profileRepository = profileRepository;
+        this.accountProfileRepository = accountProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtSecret = jwtSecret;
@@ -60,7 +64,7 @@ public class AccountService {
      */
     public boolean validateRegistration(RegistrationRequest registration) {
         Account account = registration.getAccount();
-        Profile profile = registration.getProfile();
+        AccountProfile profile = registration.getProfile();
         return !profile.getForename().isBlank() &&
                 !profile.getSurname().isBlank() &&
                 !profile.getInstitution().isBlank() &&
@@ -78,7 +82,7 @@ public class AccountService {
      */
     public int createAccount(RegistrationRequest registration) throws AccountCreationException {
         Account account = registration.getAccount();
-        Profile profile = registration.getProfile();
+        AccountProfile profile = registration.getProfile();
         if (account.getId() != null || profile.getAccountId() != null) {
             throw new AccountCreationException("The account id is not null.");
         }
@@ -98,7 +102,7 @@ public class AccountService {
         int accountId = account.getId();
         accountRoleRepository.save(new AccountRole(account.getEmail(), "USER"));
         profile.setAccountId(accountId);
-        profileRepository.save(profile);
+        accountProfileRepository.save(profile);
         return account.getId();
     }
 

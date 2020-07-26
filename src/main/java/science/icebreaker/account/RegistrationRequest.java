@@ -5,7 +5,7 @@ public class RegistrationRequest {
 
     private Account account;
 
-    private Profile profile;
+    private AccountProfile profile;
 
 
     public Account getAccount() {
@@ -18,12 +18,12 @@ public class RegistrationRequest {
     }
 
 
-    public Profile getProfile() {
+    public AccountProfile getProfile() {
         return profile;
     }
 
 
-    public void setProfile(Profile profile) {
+    public void setProfile(AccountProfile profile) {
         this.profile = profile;
     }
 }
