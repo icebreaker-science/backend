@@ -15,3 +15,14 @@ The schema of the database is stored in `database/init.sql`. A docker-compose fi
 **Application Properties**
 
 The (default values of the) application properties are stored in `src/main/resources/application.properties`. There are various ways to overwrite them, including using environment variables. Read the [Spring documentation](https://docs.spring.io/spring-boot/docs/2.3.1.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config) for details.
+
+
+## Testing
+
+```
+./gradlew clean test
+```
+
+Please ensure that the tests are run against a newly initiated database.
+
+Test methods' names should follow this pattern: `MethodName_StateUnderTest_ExpectedBehavior`.
