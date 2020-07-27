@@ -50,11 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         String requestTokenHeader = request.getHeader("Authorization");
-        if (requestTokenHeader != null) {
-            if (!requestTokenHeader.startsWith("Bearer ")) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "The \"Authorization\" header is invalid.");
-                return;
-            }
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             String jwtToken = requestTokenHeader.substring(7);
             Account account = jwtTokenValidationService.validateJwtToken(jwtToken);
             List<AccountRole> roles = accountRoleRepository.findAllByEmail(account.getEmail());
