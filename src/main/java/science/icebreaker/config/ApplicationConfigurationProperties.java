@@ -9,6 +9,12 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfigurationProperties {
 
     /**
+     * If the server is set to development mode, it will allow cross-origin requests (CORS) and may return details
+     * of exceptions.
+     */
+    private boolean development;
+
+    /**
      * This secret will be used to sign the JWT tokens.
      */
     private String jwtSecret;
@@ -17,6 +23,16 @@ public class ApplicationConfigurationProperties {
      * The number of milliseconds for which a JWT token should be valid for.
      */
     private long jwtTokenValidityMs;
+
+
+    public boolean getDevelopment() {
+        return development;
+    }
+
+
+    public void setDevelopment(boolean development) {
+        this.development = development;
+    }
 
 
     public String getJwtSecret() {
