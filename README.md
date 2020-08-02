@@ -16,6 +16,10 @@ The schema of the database is stored in `database/init.sql`. A docker-compose fi
 
 The (default values of the) application properties are stored in `src/main/resources/application.properties`. There are various ways to overwrite them, including using environment variables. Read the [Spring documentation](https://docs.spring.io/spring-boot/docs/2.3.1.RELEASE/reference/html/spring-boot-features.html#boot-features-external-config) for details.
 
+**Development Mode**
+
+The development mode allows cross-origin requests (CORS) and may return more details about exceptions. To enable it, the application property `icebreaker.development` needs to be `true`. A way to do it is to set the environment variable `ICEBREAKER_DEVELOPMENT` to `true`.
+
 
 ## Testing
 
