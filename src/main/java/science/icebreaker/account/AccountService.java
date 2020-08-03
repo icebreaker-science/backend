@@ -14,6 +14,7 @@ import science.icebreaker.config.SecurityConfig;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -52,6 +53,21 @@ public class AccountService {
         this.authenticationManager = authenticationManager;
         this.jwtSecret = jwtSecret;
         this.jwtTokenValidityMs = jwtTokenValidityMs;
+    }
+
+
+    /**
+     *
+     * @param accountId The ID of an account
+     * @return The profile of an account
+     * @throws AccountNotFoundException If there is no account with the given ID
+     */
+    public AccountProfile getAccountProfile(int accountId) throws AccountNotFoundException {
+        Optional<AccountProfile> profile = accountProfileRepository.findById(accountId);
+        if (profile.isEmpty()) {
+            throw new AccountNotFoundException(accountId);
+        }
+        return profile.get();
     }
 
 
@@ -126,7 +142,8 @@ public class AccountService {
 
     private String generateJwtToken(Account account) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("account_id", account.getId());
+        int accountId = accountRepository.findAccountByEmail(account.getEmail()).getId();
+        claims.put("account_id", accountId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(account.getEmail())
