@@ -109,6 +109,23 @@ public class ServicesTest {
 
 
     @Test
+    @Order(2)
+    public void getAccountProfile_idExists_success() throws AccountNotFoundException {
+        AccountProfile correctProfile = RegistrationRequestMock.createRegistrationRequest().getProfile();
+        AccountProfile accountProfile = accountService.getAccountProfile(1);
+        assertThat(accountProfile).isEqualTo(correctProfile);
+    }
+
+
+    @Test
+    @Order(2)
+    public void getAccountProfile_idDoesNotExist_failure() {
+        assertThatThrownBy(() -> accountService.getAccountProfile(111))
+                .isInstanceOf(AccountNotFoundException.class);
+    }
+
+
+    @Test
     @Order(3)
     public void validateJwtToken_correctToken_success() {
         login_correctData_success();

@@ -1,9 +1,9 @@
 package science.icebreaker.account;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 
 @RestController
@@ -27,6 +27,13 @@ public class AccountController {
     @PostMapping("/login")
     public String login(@RequestBody Account account) {
         return service.login(account);
+    }
+
+
+    @GetMapping("/my-profile")
+    public AccountProfile getMyProfile(Principal principal) throws AccountNotFoundException {
+        Account account = (Account) ((Authentication) principal).getPrincipal();
+        return service.getAccountProfile(account.getId());
     }
 
 }
