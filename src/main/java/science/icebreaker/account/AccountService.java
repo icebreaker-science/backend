@@ -126,7 +126,8 @@ public class AccountService {
 
     private String generateJwtToken(Account account) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("account_id", account.getId());
+        int accountId = accountRepository.findAccountByEmail(account.getEmail()).getId();
+        claims.put("account_id", accountId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(account.getEmail())
