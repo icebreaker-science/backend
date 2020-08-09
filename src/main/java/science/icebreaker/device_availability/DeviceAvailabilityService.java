@@ -1,5 +1,7 @@
 package science.icebreaker.device_availability;
 
+import java.util.List;
+
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -69,5 +71,15 @@ public class DeviceAvailabilityService {
             account
         );
         this.deviceAvailabilityRepository.save(deviceAvailability);
+    }
+
+    /**
+     * Gets all availability records related to a specific device
+     * 
+     * @param deviceId The device id to search availabilities for
+     * @return A list of the device availabilities
+     */
+    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId) {
+        return this.deviceAvailabilityRepository.findByDeviceId(deviceId);
     }
 }

@@ -74,8 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/swagger-ui.html", // Swagger
                         "/", "/account/register", "/account/login"
                 ).permitAll()
-                .antMatchers(HttpMethod.GET, "/wiki")
-                .permitAll()
+                .antMatchers(HttpMethod.GET, "/wiki", "/device-availability/").permitAll()
             .anyRequest().authenticated().and()
             .exceptionHandling()
             // We don't want to start an authentication process at this point. See MyAuthenticationEntryPoint#commence
@@ -84,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-
+    
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()

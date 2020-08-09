@@ -21,6 +21,8 @@ import science.icebreaker.wiki.WikiPageRepository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
+
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
 public class DeviceAvailabilityServiceTest {
@@ -102,5 +104,30 @@ public class DeviceAvailabilityServiceTest {
             null,
             account
         );
+    }
+
+    @Test
+    public void getDeviceAvailability_exists_success() {
+        WikiPage device = new WikiPage(WikiPage.PageType.DEVICE, "device title", "device description", "device references");
+        device = this.wikiPageRepository.save(device);
+        this.deviceAvailabilityRepository.save(
+            new DeviceAvailability(1, device, "comment", "67660", "TU KL", "Informatik People", this.account));
+        this.deviceAvailabilityRepository.save(
+            new DeviceAvailability(2, device, "comment", "67660", "TUM", "Informatik People", this.account));
+
+        List<DeviceAvailability> deviceAvailabilityList = 
+            this.deviceAvailabilityService.getDeviceAvailability(device.getId());
+            
+        assertThat(deviceAvailabilityList.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void getDeviceAvailability_empty_success() {
+        Integer deviceId = 1;
+
+        List<DeviceAvailability> deviceAvailabilityList = 
+            this.deviceAvailabilityService.getDeviceAvailability(deviceId);
+
+        assertThat(deviceAvailabilityList.size()).isEqualTo(0);
     }
 }
