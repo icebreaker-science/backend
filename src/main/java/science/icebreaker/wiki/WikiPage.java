@@ -2,7 +2,9 @@ package science.icebreaker.wiki;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +16,7 @@ public class WikiPage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(accessMode = ApiModelProperty.AccessMode.READ_ONLY, readOnly = true) // readOnly used to get the ui right
     @Nullable
     private int id;
 
@@ -105,5 +107,15 @@ public class WikiPage {
     public enum PageType {
         @JsonProperty("device")
         DEVICE
+    }
+
+    // Allow request parameters to be lower-case
+    @Component
+    static class PageTypeConverter implements Converter<String, PageType> {
+
+        @Override
+        public PageType convert(String source) {
+            return PageType.valueOf(source.toUpperCase());
+        }
     }
 }
