@@ -34,3 +34,11 @@ CREATE TABLE post (
   title TEXT NOT NULL,
   FOREIGN KEY (owner) REFERENCES account (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE TABLE wiki_page (
+  id SERIAL PRIMARY KEY,
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  reference TEXT
+);
