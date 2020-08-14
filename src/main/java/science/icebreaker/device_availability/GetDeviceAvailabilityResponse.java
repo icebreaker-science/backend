@@ -1,0 +1,68 @@
+package science.icebreaker.device_availability;
+
+public class GetDeviceAvailabilityResponse {
+    private Integer accountId;
+    private String comment;
+    private String germanPostalCode;
+    private String institution;
+    private String researchGroup;
+
+    public GetDeviceAvailabilityResponse(Integer accountId, String comment, String germanPostalCode, String institution,
+        String researchGroup) {
+        this.accountId = accountId;
+        this.comment = comment;
+        this.germanPostalCode = germanPostalCode;
+        this.institution = institution;
+        this.researchGroup = researchGroup;
+    }
+
+    public Integer getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Integer accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getGermanPostalCode() {
+        return germanPostalCode;
+    }
+
+    public void setGermanPostalCode(String germanPostalCode) {
+        this.germanPostalCode = germanPostalCode;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
+    }
+
+    public String getResearchGroup() {
+        return researchGroup;
+    }
+
+    public void setResearchGroup(String researchGroup) {
+        this.researchGroup = researchGroup;
+    }
+
+    public static GetDeviceAvailabilityResponse fromEntity(DeviceAvailability deviceAvailability) {
+        return new GetDeviceAvailabilityResponse(
+            deviceAvailability.getAccount().getId(), 
+            deviceAvailability.getComment(),
+            deviceAvailability.getGermanPostalCode(),
+            deviceAvailability.getInstitution(),
+            deviceAvailability.getResearchGroup()
+        );
+    }
+}
