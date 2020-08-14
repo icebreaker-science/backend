@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS account;
 DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS device_availability;
 
 CREATE TABLE account (
   id SERIAL PRIMARY KEY,
@@ -42,3 +43,22 @@ CREATE TABLE wiki_page (
   description TEXT NOT NULL,
   reference TEXT
 );
+
+
+/* JUSTIFICATION. Postal codes are encoded as text as they convey no semantic
+ * meaning as numbers. 
+ * NOTE. The first 2 characters reference a specific area
+*/
+CREATE TABLE device_availability (
+  id SERIAL PRIMARY KEY,
+  device_id INTEGER NOT NULL,
+  comment TEXT,
+  german_postal_code TEXT,
+  institution TEXT NOT NULL,
+  research_group TEXT,
+  account_id INTEGER NOT NULL,
+  FOREIGN KEY (account_id) REFERENCES account (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  FOREIGN KEY (device_id) REFERENCES wiki_page (id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE INDEX device_availability_device_id ON device_availability (device_id);

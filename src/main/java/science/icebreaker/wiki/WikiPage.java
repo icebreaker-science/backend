@@ -102,7 +102,7 @@ public class WikiPage {
         return Objects.hash(id, type, title, description, references);
     }
 
-    enum PageType {
+    public enum PageType {
         @JsonProperty("device")
         DEVICE
     }
