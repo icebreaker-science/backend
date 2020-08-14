@@ -1,5 +1,6 @@
 package science.icebreaker.wiki;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,15 +23,17 @@ class WikiControllerTest {
     }
 
     @Test
+    @Order(1)
     void addWikiPage_success() {
         WikiPage wikiPage = new WikiPage(WikiPage.PageType.DEVICE, "title", "description", null);
         int id = wikiController.addWikiPage(wikiPage);
         wikiPage.setId(id);
-        WikiPage savedPage = wikiPageRepository.findById(id).get();
+        WikiPage savedPage = wikiController.getWikiPages(WikiPage.PageType.DEVICE).get(0);
         assertThat(wikiPage).isEqualTo(savedPage);
     }
 
     @Test
+    @Order(2)
     void addWikiPage_invalidInput_failure() {
         //empty title
         assertThatThrownBy(() -> {
