@@ -5,10 +5,20 @@ services:
     container_name: icebreaker_postgres
     restart: unless-stopped
     ports:
-      - "12000:5432"
+      - 127.0.0.1:12000:5432
     environment:
       - POSTGRES_DB=icebreaker
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  neo4j:
+    image: neo4j:latest
+    container_name: icebreaker_neo4j
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:12220:7474  # HTTP / Web interface
+      - 127.0.0.1:12221:7687  # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/elsa  # The username cannot be changed.
