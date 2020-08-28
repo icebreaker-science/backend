@@ -28,6 +28,7 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.postgresql:postgresql'
+    compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '4.1.1'
     runtimeOnly 'com.h2database:h2'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
