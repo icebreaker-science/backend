@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -56,6 +57,19 @@ public class NetworkController {
             @RequestParam("nodes") String nodes
     ) {
         return service.getShortestPathGraph(Arrays.asList(nodes.split(",")));
+    }
+
+
+    @GetMapping("/paper")
+    @ApiOperation("Returns information about papers")
+    public List<Paper> getPapers(
+            @ApiParam(value = "A comma-separated list of ids")
+            @RequestParam("ids") String ids
+    ) {
+        List<Integer> idList = Arrays.stream(ids.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        return service.getPapers(idList);
     }
 
 }
