@@ -50,3 +50,20 @@ CREATE TABLE device_availability (
 );
 
 CREATE INDEX device_availability_device_id ON device_availability (device_id);
+
+
+CREATE TABLE paper (
+    icebreaker_id SERIAL PRIMARY KEY,
+    doi TEXT,
+    core_id TEXT,
+    title TEXT,
+    abstract TEXT,
+    has_full_text BOOLEAN,
+    year INTEGER,
+    topics JSONB,
+    subjects JSONB,
+    language_detected_most_likely TEXT,
+    language_detected_probabilities JSONB
+);
+
+CREATE INDEX papers_doi_idx ON paper (doi);

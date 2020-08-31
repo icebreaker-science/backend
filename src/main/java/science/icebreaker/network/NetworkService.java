@@ -24,13 +24,17 @@ public class NetworkService implements AutoCloseable {
 
     private final Driver driver;
 
+    private final PaperRepository paperRepository;
+
 
     public NetworkService(
             @Value("${icebreaker.neo4j.host}") String host,
             @Value("${icebreaker.neo4j.port}") String port,
             @Value("${icebreaker.neo4j.username}") String username,
-            @Value("${icebreaker.neo4j.password}") String password
+            @Value("${icebreaker.neo4j.password}") String password,
+            PaperRepository paperRepository
     ) {
+        this.paperRepository = paperRepository;
         driver = GraphDatabase.driver("bolt://" + host + ":" + port, AuthTokens.basic(username, password));
     }
 
@@ -95,6 +99,11 @@ public class NetworkService implements AutoCloseable {
                     ))
                     .collect(Collectors.toList());
         }
+    }
+
+
+    public List<Paper> getPapers(List<Integer> ids) {
+        return paperRepository.findAllByIds(ids);
     }
 
 
