@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -12,7 +14,9 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * This class tests the {@link AccountService} and the {@link JwtTokenValidationService}.
  */
+@ActiveProfiles("test")
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS) //reset context and db before test
 public class ServicesTest {
 
     private final AccountService accountService;
