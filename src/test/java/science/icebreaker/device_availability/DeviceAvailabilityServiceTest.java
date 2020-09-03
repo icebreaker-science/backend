@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
+import org.springframework.test.context.ActiveProfiles;
 import science.icebreaker.account.Account;
 import science.icebreaker.account.AccountCreationException;
 import science.icebreaker.account.AccountRepository;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
 public class DeviceAvailabilityServiceTest {
