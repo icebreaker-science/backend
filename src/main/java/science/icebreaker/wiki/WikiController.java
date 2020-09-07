@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.web.bind.annotation.*;
-import science.icebreaker.utils.IllegalRequestParameterException;
+import science.icebreaker.validation.exception.IllegalRequestParameterException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -26,7 +26,7 @@ public class WikiController {
     public int addWikiPage(@RequestBody @Valid WikiPage wikiPage) throws IllegalRequestParameterException {
         // prevent modification of existing wiki pages
         if (wikiPage.getId() != 0) {
-            throw new IllegalRequestParameterException("ID must not been set.");
+            throw new IllegalRequestParameterException("id", "ID must not been set.");
         }
         WikiPage res = wikiPageRepository.save(wikiPage);
         return res.getId();
