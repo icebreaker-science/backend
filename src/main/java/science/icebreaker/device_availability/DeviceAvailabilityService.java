@@ -4,6 +4,7 @@ import java.util.List;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import science.icebreaker.account.Account;
@@ -74,12 +75,26 @@ public class DeviceAvailabilityService {
     }
 
     /**
-     * Gets all availability records related to a specific device
+     * Gets all availability records based on some criteria
      * 
      * @param deviceId The device id to search availabilities for
+     * @param ownerId The id of the owner of the device entry
      * @return A list of the device availabilities
      */
-    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId) {
-        return this.deviceAvailabilityRepository.findByDeviceId(deviceId);
+    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId) {
+        WikiPage device = null;
+        if(deviceId != null) {
+            device = new WikiPage();
+            device.setId(deviceId);
+        }
+        Account account = null;
+        if(ownerId != null) {
+            account = new Account();
+            account.setId(ownerId);
+        }
+        DeviceAvailability availabilityEntry = new DeviceAvailability();
+        availabilityEntry.setAccount(account);
+        availabilityEntry.setDevice(device);
+        return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry));
     }
 }
