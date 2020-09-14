@@ -1,33 +1,28 @@
 package science.icebreaker.device_availability;
 
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import org.springframework.web.bind.annotation.*;
 import science.icebreaker.account.Account;
+import science.icebreaker.account.AccountNotFoundException;
 import science.icebreaker.device_availability.ControllerValidators.HasFiltersConstraint;
 import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
+import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
 import science.icebreaker.device_availability.Exceptions.InvalidFiltersException;
+import science.icebreaker.mail.MailException;
+import science.icebreaker.mail.MailService;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.Valid;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -35,9 +30,11 @@ import springfox.documentation.annotations.ApiIgnore;
 public class DeviceAvailabilityController {
 
     private DeviceAvailabilityService service;
+    private final MailService mailService;
 
-    public DeviceAvailabilityController(DeviceAvailabilityService service) {
+    public DeviceAvailabilityController(DeviceAvailabilityService service, MailService mailService) {
         this.service = service;
+        this.mailService = mailService;
     }
 
     @PostMapping("/")
@@ -103,5 +100,18 @@ public class DeviceAvailabilityController {
     @ExceptionHandler
     public ResponseEntity<String> handleException(InvalidFiltersException ex) {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/{id}/contact")
+    @ApiOperation("Contact the owner of a device.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Request successfully sent"),
+            @ApiResponse(code = 400, message = "Device availability does not exist")})
+    public void sendContactRequest(
+            @PathVariable int id,
+            @RequestBody @Valid ContactRequest contactRequest
+    ) throws AccountNotFoundException, DeviceAvailabilityNotFoundException, MailException {
+        DeviceAvailability deviceAvailability = service.getDeviceAvailability(id);
+        mailService.sendContactRequestMail(contactRequest, deviceAvailability.getAccount());
     }
 }

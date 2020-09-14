@@ -1,0 +1,15 @@
+Dear [(${contactRequest.name})],
+
+Thank you very much for your request. The following message was forwarded to the owner of the device:
+
+[(${contactRequest.message})]
+
+Icebreaker.science only offers to bring providers and seekers in contact, please arrange the terms of the cooperation or exchange directly with the provider.
+
+Thank you for using our service. If you have any questions regarding Icebreaker, please contact us at mail@icebreaker.science.
+
+Best regards,
+Your Icebreaker-Team
+
+https://icebreaker.science/
+mail@icebreaker.science

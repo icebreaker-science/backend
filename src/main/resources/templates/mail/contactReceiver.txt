@@ -1,0 +1,19 @@
+Dear [(${#strings.isEmpty(accountProfile.title) ? '' : accountProfile.title + ' '})][(${accountProfile.surname})],
+
+A request was registered for a device you offered via Icebreaker.science.
+
+In the following, you can see the contact details of the person interested in a cooperation or exchange:
+
+Name: [(${contactRequest.name})]
+Email: [(${contactRequest.email})]
+Message:
+
+[(${contactRequest.message})]
+
+Thank you for using our service. If you have any questions regarding Icebreaker, please contact us at mail@icebreaker.science.
+
+Best regards,
+Your Icebreaker-Team
+
+https://icebreaker.science/
+mail@icebreaker.science
