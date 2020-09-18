@@ -74,8 +74,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/swagger-ui.html", // Swagger
                         "/", "/account/register", "/account/login", "/network/**"
                 ).permitAll()
-                .antMatchers(HttpMethod.GET, "/wiki", "/device-availability/").permitAll()
                 .antMatchers(HttpMethod.POST, "/device-availability/{id:[0-9]+}/contact").permitAll()
+                .antMatchers(HttpMethod.GET, "/wiki", "/device-availability/", "/wiki/{\\d+}").permitAll()
             .anyRequest().authenticated().and()
             .exceptionHandling()
             // We don't want to start an authentication process at this point. See MyAuthenticationEntryPoint#commence
