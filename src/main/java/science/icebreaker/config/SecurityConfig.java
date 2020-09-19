@@ -109,7 +109,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     +
                     "from account where lower(email) = lower(?)")
                 .authoritiesByUsernameQuery(
-                    "select email as username, role as authority"
+                    "select email as username, role as authority "
                     +
                     "from account_role where lower(email) = lower(?)")
                 .passwordEncoder(encoder());
