@@ -9,14 +9,14 @@ public class AddDeviceAvailabilityRequest {
     @NotNull(message = "A device ID must be provided")
     private Integer deviceId;
     private String comment;
-    @Pattern(regexp="[\\d]{5}", message="Invalid postal code")
+    @Pattern(regexp = "[\\d]{5}", message = "Invalid postal code")
     private String germanPostalCode;
     @NotBlank(message = "An institution name must be provided")
     private String institution;
     private String researchGroup;
 
-    public AddDeviceAvailabilityRequest(Integer deviceId, String comment, String germanPostalCode, String institution,
-            String researchGroup) {
+    public AddDeviceAvailabilityRequest(Integer deviceId, String comment,
+    String germanPostalCode, String institution, String researchGroup) {
         this.deviceId = deviceId;
         this.comment = comment;
         this.germanPostalCode = germanPostalCode;

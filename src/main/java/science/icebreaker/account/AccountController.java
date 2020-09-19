@@ -24,7 +24,8 @@ public class AccountController {
 
 
     @PostMapping("/register")
-    public int register(@RequestBody RegistrationRequest registrationRequest) throws AccountCreationException {
+    public int register(@RequestBody RegistrationRequest registrationRequest)
+    throws AccountCreationException {
         return service.createAccount(registrationRequest);
     }
 

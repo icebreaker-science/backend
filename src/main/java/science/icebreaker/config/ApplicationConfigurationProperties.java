@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfigurationProperties {
 
     /**
-     * If the server is set to development mode, it will allow cross-origin requests (CORS) and may return details
+     * If the server is set to development mode,
+     * it will allow cross-origin requests (CORS) and may return details
      * of exceptions.
      */
     private boolean development;

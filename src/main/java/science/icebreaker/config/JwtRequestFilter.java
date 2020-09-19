@@ -28,6 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final AccountRoleRepository accountRoleRepository;
 
+    private final Integer tokenPrefixLength = 7; // 'Bearer '
 
     public JwtRequestFilter(
             JwtTokenValidationService jwtTokenValidationService,
@@ -39,8 +40,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 
     /**
-     * If the "Authorization" header is present, this function will extract the JWT token and validate it. If the
-     * validation is successful, the account and the roles of the user will be loaded and added to the security context.
+     * If the "Authorization" header is present,
+     * this function will extract the JWT token and validate it. If the
+     * validation is successful, the account and the roles of
+     * the user will be loaded and added to the security context.
      * If not, it will throw exceptions (see {@link JwtTokenValidationService#validateJwtToken}.
      */
     @Override
@@ -51,13 +54,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String requestTokenHeader = request.getHeader("Authorization");
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            String jwtToken = requestTokenHeader.substring(7);
+            String jwtToken = requestTokenHeader.substring(this.tokenPrefixLength);
             Account account = jwtTokenValidationService.validateJwtToken(jwtToken);
             List<AccountRole> roles = accountRoleRepository.findAllByEmail(account.getEmail());
 
             UsernamePasswordAuthenticationToken authenticationToken
                     = new UsernamePasswordAuthenticationToken(account, null, roles);
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            authenticationToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         filterChain.doFilter(request, response);

@@ -38,6 +38,7 @@ public class WebConfig {
     }
 
 
+    @SuppressWarnings("checkstyle:missingjavadocmethod")
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

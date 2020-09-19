@@ -47,7 +47,9 @@ bootJar {
 }
 
 checkstyle {
-    configFile file("sun_checks.xml")
+    toolVersion '8.36.1'
+    configFile file("${project.rootDir}/checkstyle/checkstyle.xml")
+    checkstyleTest.enabled = false
 }
 
 checkstyleMain {

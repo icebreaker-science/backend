@@ -101,14 +101,23 @@ public class AccountProfile {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AccountProfile that = (AccountProfile) o;
-        return title.equals(that.title) &&
-                forename.equals(that.forename) &&
-                surname.equals(that.surname) &&
-                institution.equals(that.institution) &&
-                city.equals(that.city) &&
+        return title.equals(that.title)
+                &&
+                forename.equals(that.forename)
+                &&
+                surname.equals(that.surname)
+                &&
+                institution.equals(that.institution)
+                &&
+                city.equals(that.city)
+                &&
                 researchArea.equals(that.researchArea);
     }
 

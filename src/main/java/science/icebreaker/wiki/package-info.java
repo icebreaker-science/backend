@@ -1,5 +1,6 @@
 /**
- * This package contains everything regarding the wiki content. The wiki page functions as the basic data structure
+ * This package contains everything regarding the wiki content.
+ * The wiki page functions as the basic data structure
  * of the wiki.
  */
 
