@@ -37,8 +37,7 @@ public class ServicesTest {
     @Order(1)
     public void createAccount_validInput_success() throws AccountCreationException {
         RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
-        int id = accountService.createAccount(request);
-        assertThat(id).isEqualTo(1);
+        accountService.createAccount(request);
     }
 
 
