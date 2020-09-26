@@ -1,4 +1,4 @@
-package science.icebreaker.account;
+package science.icebreaker.exception;
 
 
 import science.icebreaker.exception.BaseException;

@@ -2,6 +2,8 @@ package science.icebreaker.account;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import science.icebreaker.exception.AccountCreationException;
+import science.icebreaker.exception.AccountNotFoundException;
 
 import java.security.Principal;
 

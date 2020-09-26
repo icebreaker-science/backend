@@ -1,4 +1,4 @@
-package science.icebreaker.device_availability.Exceptions;
+package science.icebreaker.exception;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
