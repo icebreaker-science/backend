@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import science.icebreaker.exception.EntityNotFoundException;
+
 import javax.validation.ConstraintViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,11 +28,11 @@ class WikiControllerTest {
 
     @Test
     @Order(1)
-    void addWikiPage_success() {
+    void addWikiPage_success() throws EntityNotFoundException {
         WikiPage wikiPage = new WikiPage(WikiPage.PageType.DEVICE, "title", "description", null);
         int id = wikiController.addWikiPage(wikiPage);
         wikiPage.setId(id);
-        WikiPage savedPage = wikiController.getWikiPages(WikiPage.PageType.DEVICE).get(0);
+        WikiPage savedPage = wikiController.getWikiPage(id);
         assertThat(wikiPage).isEqualTo(savedPage);
     }
 
