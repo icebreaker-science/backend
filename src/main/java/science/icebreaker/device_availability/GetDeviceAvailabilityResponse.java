@@ -1,6 +1,7 @@
 package science.icebreaker.device_availability;
 
 public class GetDeviceAvailabilityResponse {
+    private Integer id;
     private Integer deviceId;
     private Integer accountId;
     private String comment;
@@ -8,14 +9,19 @@ public class GetDeviceAvailabilityResponse {
     private String institution;
     private String researchGroup;
 
-    public GetDeviceAvailabilityResponse(Integer deviceId, Integer accountId, String comment, String germanPostalCode, String institution,
+    public GetDeviceAvailabilityResponse(Integer id, Integer deviceId, Integer accountId, String comment, String germanPostalCode, String institution,
         String researchGroup) {
+        this.id = id;
         this.deviceId = deviceId;
         this.accountId = accountId;
         this.comment = comment;
         this.germanPostalCode = germanPostalCode;
         this.institution = institution;
         this.researchGroup = researchGroup;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public Integer getDeviceId() {
@@ -68,8 +74,9 @@ public class GetDeviceAvailabilityResponse {
 
     public static GetDeviceAvailabilityResponse fromEntity(DeviceAvailability deviceAvailability) {
         return new GetDeviceAvailabilityResponse(
+            deviceAvailability.getId(),
             deviceAvailability.getDevice().getId(),
-            deviceAvailability.getAccount().getId(), 
+            deviceAvailability.getAccount().getId(),
             deviceAvailability.getComment(),
             deviceAvailability.getGermanPostalCode(),
             deviceAvailability.getInstitution(),

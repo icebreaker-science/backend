@@ -75,6 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/", "/account/register", "/account/login", "/network/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.GET, "/wiki", "/device-availability/").permitAll()
+                .antMatchers(HttpMethod.POST, "/device-availability/{id:[0-9]+}/contact").permitAll()
             .anyRequest().authenticated().and()
             .exceptionHandling()
             // We don't want to start an authentication process at this point. See MyAuthenticationEntryPoint#commence
