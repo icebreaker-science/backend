@@ -17,9 +17,13 @@ import science.icebreaker.account.AccountRepository;
 import science.icebreaker.account.AccountService;
 import science.icebreaker.account.RegistrationRequest;
 import science.icebreaker.account.RegistrationRequestMock;
-import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
+import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.mail.MailException;
 import science.icebreaker.wiki.WikiPage;
 import science.icebreaker.wiki.WikiPageRepository;
+
+import javax.validation.ConstraintViolationException;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -32,6 +36,7 @@ public class DeviceAvailabilityServiceTest {
 
     private DeviceAvailabilityRepository deviceAvailabilityRepository;
     private DeviceAvailabilityService deviceAvailabilityService;
+    private DeviceAvailabilityController deviceAvailabilityController;
     private WikiPageRepository wikiPageRepository;
     private AccountService accountService;
     private AccountRepository accountRepository;
@@ -39,10 +44,12 @@ public class DeviceAvailabilityServiceTest {
 
     @Autowired
     public DeviceAvailabilityServiceTest(DeviceAvailabilityService deviceAvailabilityService,
+            DeviceAvailabilityController deviceAvailabilityController,
             AccountService accountService, DeviceAvailabilityRepository deviceAvailabilityRepository,
             WikiPageRepository wikiPageRepository, AccountRepository accountRepository) {
         this.deviceAvailabilityService = deviceAvailabilityService;
         this.deviceAvailabilityRepository = deviceAvailabilityRepository;
+        this.deviceAvailabilityController = deviceAvailabilityController;
         this.wikiPageRepository = wikiPageRepository;
         this.accountService = accountService;
         this.accountRepository = accountRepository;
@@ -181,5 +188,42 @@ public class DeviceAvailabilityServiceTest {
             this.deviceAvailabilityService.getDeviceAvailability(null, this.account.getId());
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(2);
-    } 
+    }
+
+    @Test
+    public void sendContactRequest_prepare_mail_success() {
+        // Expect MailException because mail server is not configured
+        assertThatThrownBy(() -> {
+            RegistrationRequest registrationRequest = RegistrationRequestMock.createRegistrationRequest();
+            registrationRequest.getAccount().setEmail("ContactRequestTest@icebreaker.science");
+            Integer id = this.accountService.createAccount(registrationRequest);
+            Account account = registrationRequest.getAccount();
+            account.setId(id);
+
+            WikiPage device = new WikiPage(WikiPage.PageType.DEVICE, "device title", "device description", "device references");
+            device = this.wikiPageRepository.save(device);
+            DeviceAvailability deviceAvailability = this.deviceAvailabilityRepository.save(
+                    new DeviceAvailability(device, "comment", "67660", "TU KL", "Informatik People", account));
+
+            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
+
+            this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest);
+        }).isInstanceOf(MailException.class);
+    }
+
+    @Test
+    public void sendContactRequest_device_not_exist() {
+        assertThatThrownBy(() -> {
+            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
+            this.deviceAvailabilityController.sendContactRequest(-1, contactRequest);
+        }).isInstanceOf(DeviceAvailabilityNotFoundException.class);
+    }
+
+    @Test
+    public void sendContactRequest_request_not_valid() {
+        assertThatThrownBy(() -> {
+            ContactRequest contactRequest = new ContactRequest("A", "email.icebreaker.science", "message");
+            this.deviceAvailabilityController.sendContactRequest(1, contactRequest);
+        }).isInstanceOf(ConstraintViolationException.class);
+    }
 }
