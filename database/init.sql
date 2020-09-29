@@ -1,7 +1,19 @@
 CREATE TABLE account (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+  is_enabled boolean NOT NULL
+);
+
+create table account_confirmation
+(
+    id                 integer not null
+        constraint account_confirmation_pkey
+            primary key,
+    confirmation_token varchar(255),
+    created_date       timestamp,
+    account_id         integer not null
+        constraint account_confirmation_account_id_fkey
+            references account
 );
 
 CREATE TABLE account_role (
