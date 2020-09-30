@@ -11,11 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import science.icebreaker.config.SecurityConfig;
+import science.icebreaker.exception.*;
 import science.icebreaker.mail.MailService;
-import science.icebreaker.exception.AccountCreationException;
-import science.icebreaker.exception.AccountNotFoundException;
-import science.icebreaker.exception.ErrorCodeEnum;
-import science.icebreaker.exception.IllegalRequestParameterException;
 
 import java.util.*;
 
@@ -174,7 +171,8 @@ public class AccountService {
         Date oneHourAgo = new Date(System.currentTimeMillis() - 3600 * 1000);
 
         if(accountConfirmation == null || accountConfirmation.getCreatedDate().before(oneHourAgo)) {
-            throw new AccountConfirmationException("Account confirmation failed, invalid or expired token");
+            throw new AccountConfirmationException()
+                    .withErrorCode(ErrorCodeEnum.ERR_ACC_006);
         }
 
         Account account = accountConfirmation.getAccount();
@@ -188,7 +186,8 @@ public class AccountService {
         Account account = accountRepository.findAccountByEmail(email);
 
         if(account.getEnabled()) {
-            throw new AccountConfirmationException("Account already verified");
+            throw new AccountConfirmationException()
+                    .withErrorCode(ErrorCodeEnum.ERR_ACC_005);
         }
 
         saveAccountConfirmationTokenAndSendEmail(account);
