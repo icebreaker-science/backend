@@ -7,7 +7,8 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
-import science.icebreaker.device_availability.Exceptions.InvalidFiltersException;
+import science.icebreaker.exception.InvalidFiltersException;
+import science.icebreaker.exception.ErrorCodeEnum;
 
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
 public class HasFiltersValidator implements ConstraintValidator<HasFiltersConstraint, Object[]> {
@@ -17,7 +18,7 @@ public class HasFiltersValidator implements ConstraintValidator<HasFiltersConstr
      * at least one is not null
      * 
      * @param values The params passed
-     * @param conext
+     * @param context
      * @return true if the params satisfy the validation condition.
      * @throws InvalidFiltersException if all params are null.
      */
@@ -27,6 +28,7 @@ public class HasFiltersValidator implements ConstraintValidator<HasFiltersConstr
         Boolean hasFilters = Arrays.asList(values).stream().anyMatch((obj) -> obj != null);
 
         if(hasFilters) return true;
-        else throw new InvalidFiltersException("Must provide at least one filter param");
+        else throw new InvalidFiltersException()
+                .withErrorCode(ErrorCodeEnum.ERR_FILTER_001);
     }
 }

@@ -11,14 +11,14 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import org.springframework.test.context.ActiveProfiles;
 import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountCreationException;
+import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.account.AccountProfile;
 import science.icebreaker.account.AccountRepository;
 import science.icebreaker.account.AccountService;
 import science.icebreaker.account.RegistrationRequest;
 import science.icebreaker.account.RegistrationRequestMock;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.mail.MailException;
 import science.icebreaker.wiki.WikiPage;
 import science.icebreaker.wiki.WikiPageRepository;

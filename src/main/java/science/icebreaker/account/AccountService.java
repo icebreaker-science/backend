@@ -12,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import science.icebreaker.config.SecurityConfig;
 import science.icebreaker.mail.MailService;
+import science.icebreaker.exception.AccountCreationException;
+import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.ErrorCodeEnum;
+import science.icebreaker.exception.IllegalRequestParameterException;
 
 import java.util.*;
 
@@ -70,7 +74,9 @@ public class AccountService {
     public AccountProfile getAccountProfile(int accountId) throws AccountNotFoundException {
         Optional<AccountProfile> profile = accountProfileRepository.findById(accountId);
         if (profile.isEmpty()) {
-            throw new AccountNotFoundException(accountId);
+            throw new AccountNotFoundException()
+                    .withErrorCode(ErrorCodeEnum.ERR_ACC_004)
+                    .withArgs(accountId);
         }
         return profile.get();
     }
@@ -105,10 +111,10 @@ public class AccountService {
         Account account = registration.getAccount();
         AccountProfile profile = registration.getProfile();
         if (account.getId() != null || profile.getAccountId() != null) {
-            throw new AccountCreationException("The account id is not null.");
+            throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_002);
         }
         if (!validateRegistration(registration)) {
-            throw new AccountCreationException("Validation error");
+            throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_003);
         }
 
         account.setEmail(account.getEmail().strip().toLowerCase());
@@ -120,7 +126,7 @@ public class AccountService {
             Account savedAccount = accountRepository.save(account);
             saveAccountConfirmationTokenAndSendEmail(savedAccount);
         } catch (DataIntegrityViolationException e) {
-            throw new AccountCreationException("The email is already used.");
+            throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_001);
         }
         int accountId = account.getId();
         accountRoleRepository.save(new AccountRole(account.getEmail(), "USER"));
@@ -140,7 +146,7 @@ public class AccountService {
      */
     public String login(Account account) {
         if (account.getId() != null) {
-            throw new IllegalArgumentException("The account id is not null.");
+            throw new IllegalRequestParameterException().withErrorCode(ErrorCodeEnum.ERR_ACC_002);
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(account.getEmail(),
                 account.getPassword()));

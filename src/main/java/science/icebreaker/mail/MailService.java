@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountNotFoundException;
 import science.icebreaker.account.AccountProfile;
 import science.icebreaker.account.AccountService;
 import science.icebreaker.config.MailConfigurationProperties;
 import science.icebreaker.device_availability.ContactRequest;
+import science.icebreaker.exception.AccountNotFoundException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
