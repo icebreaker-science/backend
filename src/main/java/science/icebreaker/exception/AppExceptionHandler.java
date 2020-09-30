@@ -26,7 +26,7 @@ public class AppExceptionHandler {
             DeviceAvailabilityCreationException.class,
             IllegalRequestParameterException.class
     })
-    public ResponseEntity<Object> handleAccountCreationException(HttpServletRequest request, BaseException exception, Locale locale) {
+    public ResponseEntity<Object> handleExceptions(HttpServletRequest request, BaseException exception, Locale locale) {
 
         Object[] args = exception.getArgs();
         String errorCode = exception.getErrorCode().value;
