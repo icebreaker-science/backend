@@ -1,9 +1,12 @@
 package science.icebreaker.account;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -34,6 +37,26 @@ public class AccountController {
     public AccountProfile getMyProfile(Principal principal) throws AccountNotFoundException {
         Account account = (Account) ((Authentication) principal).getPrincipal();
         return service.getAccountProfile(account.getId());
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<Object> confirmAccount(@RequestParam(name = "token") String confirmationToken) {
+        service.confirmAccount(confirmationToken);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Account verified");
+
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/resend-confirmation-email")
+    public ResponseEntity<Object> resendConfirmationEmail(@RequestParam String email) {
+        service.resendConfirmationEmail(email);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Account confirmation email sent");
+
+        return ResponseEntity.ok(body);
     }
 
 }
