@@ -160,8 +160,6 @@ public class AccountService {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-<<<<<<< 2372b0318e00ed7e8d5ff7d74edde7675bc46fff
-=======
 
     public void confirmAccount(String confirmationToken) {
         AccountConfirmation accountConfirmation = accountConfirmationRepository
@@ -214,5 +212,4 @@ public class AccountService {
 
         mailService.sendMail(email, message, subject);
     }
->>>>>>> allow to acces email confirmation urls without authorization
 }
