@@ -12,11 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountNotFoundException;
 import science.icebreaker.device_availability.ControllerValidators.HasFiltersConstraint;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
-import science.icebreaker.device_availability.Exceptions.InvalidFiltersException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.mail.MailException;
 import science.icebreaker.mail.MailService;
 import springfox.documentation.annotations.ApiIgnore;
@@ -68,38 +67,28 @@ public class DeviceAvailabilityController {
         @RequestParam(name="device", required=false) Integer deviceId,
         @RequestParam(required=false) Integer ownerId
         ) {
-            /**
-             * Temporary workaround to disallow users from accessing other users' device availabilities
-             * TODO: when the access rights are well defined and implemented, correct this impl.
-             */
-            if(ownerId != null) {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        /**
+         * Temporary workaround to disallow users from accessing other users' device availabilities
+         * TODO: when the access rights are well defined and implemented, correct this impl.
+         */
+        if (ownerId != null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-                //No role or id is different than the ownerId provided
-                if(!(authentication.getPrincipal() instanceof Account) ||
+            //No role or id is different than the ownerId provided
+            if (!(authentication.getPrincipal() instanceof Account) ||
                     (((Account) authentication.getPrincipal()).getId() != ownerId))
-                    return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
-            }
-            return new ResponseEntity<>(
+                return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(
                 service.getDeviceAvailability(
-                    deviceId,
-                    ownerId
+                        deviceId,
+                        ownerId
                 )
-                .stream()
-                .map(GetDeviceAvailabilityResponse::fromEntity)
-                .collect(Collectors.toList()),
+                        .stream()
+                        .map(GetDeviceAvailabilityResponse::fromEntity)
+                        .collect(Collectors.toList()),
                 HttpStatus.OK
-            );
-    }
-
-    /**
-     * Handles the custom validation error {@link InvalidFiltersException}
-     * @param ex
-     * @return The response object
-     */
-    @ExceptionHandler
-    public ResponseEntity<String> handleException(InvalidFiltersException ex) {
-        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        );
     }
 
     @PostMapping("/{id}/contact")

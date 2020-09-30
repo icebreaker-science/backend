@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Example;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import science.icebreaker.account.Account;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.wiki.WikiPage;
 import science.icebreaker.wiki.WikiPageRepository;
 
@@ -62,8 +64,16 @@ public class DeviceAvailabilityService {
             Account account
     ) throws DeviceAvailabilityCreationException {
         Optional<WikiPage> device = this.wikiPageRepository.findById(deviceId);
-        if(device.isEmpty()) throw new DeviceAvailabilityCreationException("Device does not exist");
-        if(device.get().getType() != WikiPage.PageType.DEVICE) throw new DeviceAvailabilityCreationException("Wiki Page is not a device");
+        if (device.isEmpty()) {
+            throw new DeviceAvailabilityCreationException()
+                    .withErrorCode(ErrorCodeEnum.ERR_DEVICE_001)
+                    .withStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        if (device.get().getType() != WikiPage.PageType.DEVICE) {
+            throw new DeviceAvailabilityCreationException()
+                    .withErrorCode(ErrorCodeEnum.ERR_DEVICE_002)
+                    .withStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
         DeviceAvailability deviceAvailability = new DeviceAvailability(
             device.get(),
             comment,
@@ -106,6 +116,11 @@ public class DeviceAvailabilityService {
      * @throws DeviceAvailabilityNotFoundException if no entry with {@code id} exist
      */
     public DeviceAvailability getDeviceAvailability(Integer id) throws DeviceAvailabilityNotFoundException {
-        return this.deviceAvailabilityRepository.findById(id).orElseThrow(() -> new DeviceAvailabilityNotFoundException(id));
+        return this.deviceAvailabilityRepository.findById(id)
+                .orElseThrow(
+                        () -> new DeviceAvailabilityNotFoundException()
+                                .withErrorCode(ErrorCodeEnum.ERR_DEVICE_003)
+                                .withArgs(id)
+                );
     }
 }
