@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import science.icebreaker.account.Account;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.wiki.WikiPage;
@@ -116,6 +116,11 @@ public class DeviceAvailabilityService {
      * @throws DeviceAvailabilityNotFoundException if no entry with {@code id} exist
      */
     public DeviceAvailability getDeviceAvailability(Integer id) throws DeviceAvailabilityNotFoundException {
-        return this.deviceAvailabilityRepository.findById(id).orElseThrow(() -> new DeviceAvailabilityNotFoundException(id));
+        return this.deviceAvailabilityRepository.findById(id)
+                .orElseThrow(
+                        () -> new DeviceAvailabilityNotFoundException()
+                                .withErrorCode(ErrorCodeEnum.ERR_DEVICE_003)
+                                .withArgs(id)
+                );
     }
 }
