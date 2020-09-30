@@ -28,10 +28,6 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
     compile group: 'io.springfox', name: 'springfox-bean-validators', version: '2.9.2'
 
-    compileOnly "org.projectlombok:lombok:1.18.12"
-    annotationProcessor "org.projectlombok:lombok:1.18.12"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.12"
-
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.postgresql:postgresql'
     compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '4.1.1'
