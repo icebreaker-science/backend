@@ -13,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import science.icebreaker.account.Account;
 import science.icebreaker.device_availability.ControllerValidators.HasFiltersConstraint;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.mail.MailException;
