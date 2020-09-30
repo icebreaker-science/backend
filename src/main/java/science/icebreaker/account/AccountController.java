@@ -39,8 +39,8 @@ public class AccountController {
         return service.getAccountProfile(account.getId());
     }
 
-    @GetMapping("/confirm")
-    public ResponseEntity<Object> confirmAccount(@RequestParam(name = "token") String confirmationToken) {
+    @PostMapping("/validate-email")
+    public ResponseEntity<Object> confirmAccount(@RequestParam(name = "key") String confirmationToken) {
         service.confirmAccount(confirmationToken);
 
         Map<String, String> body = new HashMap<>();
