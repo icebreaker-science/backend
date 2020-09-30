@@ -207,7 +207,7 @@ public class AccountService {
         //TODO
         // change email template, this is only for testing
         String message = "To confirm your account, please click here : "
-                + "http://localhost:9090/account/confirm?token=" + confirmationToken;
+                + "https://{host}/validate-email?key=" + confirmationToken;
         String subject = "Complete Registration!";
 
         mailService.sendMail(email, message, subject);
