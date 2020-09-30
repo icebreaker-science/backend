@@ -10,7 +10,8 @@ public enum ErrorCodeEnum {
     ERR_DEVICE_001("ERR_DEVICE_001"),
     ERR_DEVICE_002("ERR_DEVICE_002"),
     ERR_DEVICE_003("ERR_DEVICE_003"),
-    ERR_WIKI_001("ERR_WIKI_001");
+    ERR_WIKI_001("ERR_WIKI_001"),
+    ERR_WIKI_002("ERR_WIKI_002");
 
     public final String value;
 

@@ -3,12 +3,16 @@ package science.icebreaker.wiki;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.springframework.web.bind.annotation.*;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 
+import science.icebreaker.exception.EntityNotFoundException;
+
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class WikiController {
@@ -41,6 +45,20 @@ public class WikiController {
             @ApiResponse(code = 400, message = "Parameter not valid")})
     public List<WikiPage> getWikiPages(@RequestParam WikiPage.PageType type) {
         return wikiPageRepository.findAllByType(type);
+    }
+
+    @GetMapping("/wiki/{id}")
+    @ApiOperation("Get a wiki page by ID")
+    @ApiResponses(value ={
+        @ApiResponse(code = 200, message = "The wiki page entry"),
+        @ApiResponse(code = 404, message = "Wiki page entry not found")
+    })
+    public WikiPage getWikiPage(@PathVariable Integer id) throws EntityNotFoundException {
+        Optional<WikiPage> wikiPage = wikiPageRepository.findById(id);
+        if(wikiPage.isPresent()) return wikiPage.get();
+        else throw new EntityNotFoundException()
+            .withErrorCode(ErrorCodeEnum.ERR_WIKI_002)
+            .withArgs(id);
     }
 }
 
