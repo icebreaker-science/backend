@@ -13,6 +13,7 @@ import science.icebreaker.config.SecurityConfig;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.ErrorCodeEnum;
+import science.icebreaker.exception.IllegalRequestParameterException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -137,7 +138,7 @@ public class AccountService {
      */
     public String login(Account account) {
         if (account.getId() != null) {
-            throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_002);
+            throw new IllegalRequestParameterException().withErrorCode(ErrorCodeEnum.ERR_ACC_002);
         }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(account.getEmail(),
                 account.getPassword()));
