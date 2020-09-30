@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import science.icebreaker.exception.AccountCreationException;
+import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.BaseException;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -107,7 +110,7 @@ public class ServicesTest {
         Account account3 = RegistrationRequestMock.createRegistrationRequest().getAccount();
         account3.setId(1);
         assertThatThrownBy(() -> accountService.login(account3))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BaseException.class);
     }
 
 
