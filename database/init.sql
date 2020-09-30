@@ -1,19 +1,21 @@
 CREATE TABLE account (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  is_enabled boolean NOT NULL
+  is_enabled boolean NOT NULL DEFAULT false
 );
 
 create table account_confirmation
 (
-    id                 integer not null
-        constraint account_confirmation_pkey
-            primary key,
-    confirmation_token varchar(255),
-    created_date       timestamp,
-    account_id         integer not null
-        constraint account_confirmation_account_id_fkey
-            references account
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    confirmation_token character varying(255) COLLATE pg_catalog."default",
+    created_date timestamp without time zone,
+    account_id integer NOT NULL,
+    CONSTRAINT account_confirmation_pkey PRIMARY KEY (id),
+    CONSTRAINT account_confirmation_account_id_fkey FOREIGN KEY (account_id)
+        REFERENCES account (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
 );
 
 CREATE TABLE account_role (
