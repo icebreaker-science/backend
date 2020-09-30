@@ -12,11 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountNotFoundException;
 import science.icebreaker.device_availability.ControllerValidators.HasFiltersConstraint;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
 import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
-import science.icebreaker.device_availability.Exceptions.InvalidFiltersException;
+import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.mail.MailException;
 import science.icebreaker.mail.MailService;
 import springfox.documentation.annotations.ApiIgnore;
@@ -90,16 +89,6 @@ public class DeviceAvailabilityController {
                         .collect(Collectors.toList()),
                 HttpStatus.OK
         );
-    }
-
-    /**
-     * Handles the custom validation error {@link InvalidFiltersException}
-     * @param ex
-     * @return The response object
-     */
-    @ExceptionHandler
-    public ResponseEntity<String> handleException(InvalidFiltersException ex) {
-        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/{id}/contact")

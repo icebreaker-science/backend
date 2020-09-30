@@ -9,8 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import science.icebreaker.account.Account;
-import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityCreationException;
 import science.icebreaker.device_availability.Exceptions.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.wiki.WikiPage;
 import science.icebreaker.wiki.WikiPageRepository;
 
