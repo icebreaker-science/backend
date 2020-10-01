@@ -1,6 +1,7 @@
 CREATE TABLE account (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
   is_enabled boolean NOT NULL DEFAULT false
 );
 
