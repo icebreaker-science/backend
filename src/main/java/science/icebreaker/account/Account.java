@@ -21,9 +21,12 @@ public class Account implements Principal {
 
     private String password;
 
+    private Boolean isEnabled;
+
 
     public Account() {
     }
+
 
 
     public Account(@Nullable Integer id, String email, String password) {
@@ -63,6 +66,13 @@ public class Account implements Principal {
         this.password = password;
     }
 
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
 
     @Override
     public boolean equals(Object o) {
