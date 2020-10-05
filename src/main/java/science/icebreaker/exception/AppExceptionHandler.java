@@ -7,8 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
 
 @ControllerAdvice
 public class AppExceptionHandler {
@@ -26,18 +30,27 @@ public class AppExceptionHandler {
             DeviceAvailabilityCreationException.class,
             IllegalRequestParameterException.class
     })
-    public ResponseEntity<Object> handleExceptions(HttpServletRequest request, BaseException exception, Locale locale) {
+    public ResponseEntity<Object> handleExceptions(
+        HttpServletRequest request,
+        BaseException exception,
+        Locale locale
+    ) {
 
         Object[] args = exception.getArgs();
         String errorCode = exception.getErrorCode().value;
 
         String message = messageSource.getMessage(errorCode, args, locale);
-        HttpStatus status = exception.getStatus() == null ? HttpStatus.BAD_REQUEST : exception.getStatus();
+        HttpStatus status = exception.getStatus() == null
+            ? HttpStatus.BAD_REQUEST : exception.getStatus();
 
         return buildResponse(new HttpHeaders(), status, Collections.singletonList(message));
     }
 
-    private ResponseEntity<Object> buildResponse(HttpHeaders headers, HttpStatus status, List<String> errors) {
+    private ResponseEntity<Object> buildResponse(
+        HttpHeaders headers,
+        HttpStatus status,
+        List<String> errors
+    ) {
         AppErrorResponse errorResponse = new AppErrorResponse();
 
         errorResponse.setTimestamp(new Date());

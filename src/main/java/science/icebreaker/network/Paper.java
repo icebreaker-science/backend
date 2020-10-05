@@ -8,7 +8,8 @@ import javax.persistence.Id;
 public class Paper {
 
     /**
-     * This field is called icebreakerId to distinguish from the original core id (ID in the core dataset).
+     * This field is called icebreakerId to distinguish
+     * from the original core id (ID in the core dataset).
      */
     @Id
     private int icebreakerId;

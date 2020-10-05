@@ -2,6 +2,13 @@ package science.icebreaker.account;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,12 +17,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import science.icebreaker.config.SecurityConfig;
-import science.icebreaker.exception.*;
+
+import science.icebreaker.exception.AccountConfirmationException;
+import science.icebreaker.exception.AccountCreationException;
+import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.ErrorCodeEnum;
+import science.icebreaker.exception.IllegalRequestParameterException;
 import science.icebreaker.mail.MailService;
-
-import java.util.*;
-
 
 /**
  * Please refer to {@link SecurityConfig} for an overview of the security concept.
@@ -50,7 +58,8 @@ public class AccountService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             @Value("${icebreaker.jwt-secret}") String jwtSecret,
-            @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs, AccountConfirmationRepository accountConfirmationRepository) {
+            @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs,
+            AccountConfirmationRepository accountConfirmationRepository) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
         this.accountProfileRepository = accountProfileRepository;
@@ -174,9 +183,11 @@ public class AccountService {
         AccountConfirmation accountConfirmation = accountConfirmationRepository
                 .findAccountConfirmationByConfirmationToken(confirmationToken);
 
-        Date oneHourAgo = new Date(System.currentTimeMillis() - 3600 * 1000);
+        final int oneHour = 3600000; //one hour in milliseconds
+        Date oneHourAgo = new Date(System.currentTimeMillis() - oneHour);
 
-        if(accountConfirmation == null || accountConfirmation.getCreatedDate().before(oneHourAgo)) {
+        if (accountConfirmation == null
+            || accountConfirmation.getCreatedDate().before(oneHourAgo)) {
             throw new AccountConfirmationException()
                     .withErrorCode(ErrorCodeEnum.ERR_ACC_006);
         }
@@ -191,7 +202,7 @@ public class AccountService {
     public void resendConfirmationEmail(String email) {
         Account account = accountRepository.findAccountByEmail(email);
 
-        if(account.getEnabled()) {
+        if (account.getEnabled()) {
             throw new AccountConfirmationException()
                     .withErrorCode(ErrorCodeEnum.ERR_ACC_005);
         }

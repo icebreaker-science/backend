@@ -89,8 +89,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/account/login",
                         "/network/**"
                 ).permitAll()
-                .antMatchers(HttpMethod.POST, "/device-availability/{id:[0-9]+}/contact").permitAll()
-                .antMatchers(HttpMethod.GET, "/wiki", "/device-availability/", "/wiki/{\\d+}").permitAll()
+                .antMatchers(HttpMethod.POST,
+                    "/device-availability/{id:[0-9]+}/contact"
+                ).permitAll()
+                .antMatchers(HttpMethod.GET,
+                    "/wiki",
+                    "/device-availability/",
+                    "/wiki/{\\d+}"
+                ).permitAll()
             .anyRequest().authenticated().and()
             .exceptionHandling()
             // We don't want to start an authentication process at this point.

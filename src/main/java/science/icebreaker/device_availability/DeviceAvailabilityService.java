@@ -90,19 +90,19 @@ public class DeviceAvailabilityService {
 
     /**
      * Gets all availability records based on some criteria
-     * 
+     *
      * @param deviceId The device id to search availabilities for
      * @param ownerId The id of the owner of the device entry
      * @return A list of the device availabilities
      */
     public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId) {
         WikiPage device = null;
-        if(deviceId != null) {
+        if (deviceId != null) {
             device = new WikiPage();
             device.setId(deviceId);
         }
         Account account = null;
-        if(ownerId != null) {
+        if (ownerId != null) {
             account = new Account();
             account.setId(ownerId);
         }
@@ -118,7 +118,8 @@ public class DeviceAvailabilityService {
      * @return one device availability entry
      * @throws DeviceAvailabilityNotFoundException if no entry with {@code id} exist
      */
-    public DeviceAvailability getDeviceAvailability(Integer id) throws DeviceAvailabilityNotFoundException {
+    public DeviceAvailability getDeviceAvailability(Integer id)
+        throws DeviceAvailabilityNotFoundException {
         return this.deviceAvailabilityRepository.findById(id)
                 .orElseThrow(
                         () -> new DeviceAvailabilityNotFoundException()

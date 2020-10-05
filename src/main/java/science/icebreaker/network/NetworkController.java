@@ -25,8 +25,10 @@ public class NetworkController {
 
 
     @GetMapping("")
-    @ApiOperation("Returns the number of nodes - just for fun. This endpoint can change any time and should not be " +
-            "actually used.")
+    @ApiOperation(
+        "Returns the number of nodes - just for fun."
+        +
+        "This endpoint can change any time and should not be actually used.")
     public int getNumberOfNodes() {
         return service.countNodes();
     }

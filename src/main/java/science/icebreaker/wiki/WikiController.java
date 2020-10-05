@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.springframework.web.bind.annotation.*;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 
@@ -13,6 +12,7 @@ import science.icebreaker.exception.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,16 +57,19 @@ public class WikiController {
 
     @GetMapping("/wiki/{id}")
     @ApiOperation("Get a wiki page by ID")
-    @ApiResponses(value ={
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The wiki page entry"),
         @ApiResponse(code = 404, message = "Wiki page entry not found")
     })
     public WikiPage getWikiPage(@PathVariable Integer id) throws EntityNotFoundException {
         Optional<WikiPage> wikiPage = wikiPageRepository.findById(id);
-        if(wikiPage.isPresent()) return wikiPage.get();
-        else throw new EntityNotFoundException()
-            .withErrorCode(ErrorCodeEnum.ERR_WIKI_002)
-            .withArgs(id);
+        if (wikiPage.isPresent()) {
+            return wikiPage.get();
+        } else {
+            throw new EntityNotFoundException()
+                .withErrorCode(ErrorCodeEnum.ERR_WIKI_002)
+                .withArgs(id);
+        }
     }
 }
 
