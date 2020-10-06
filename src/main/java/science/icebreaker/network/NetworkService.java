@@ -98,8 +98,8 @@ public class NetworkService implements AutoCloseable {
                             + "unwind nodes(p) as tmp "
                             + "with collect(distinct(tmp)) as nodes_on_path "
                             + "match (n:Topic)-[e]-(m:Topic) "
-                            + "where n in nodes_on_path and m in nodes_on_path"
-                            + " and n.name < m.name "
+                            + "where n in nodes_on_path and m in nodes_on_path "
+                            + "and n.name < m.name "
                             + "return n.name, m.name, e.weight, e.normalizedWeight, e.references "
                             + "limit " + MAX_RETURNED_EDGES,
                     parameters("nodes", nodes));

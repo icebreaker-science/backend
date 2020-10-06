@@ -112,12 +112,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(this.dataSource)
                 .usersByUsernameQuery(
                     "select email as username, password, true "
-                    +
-                    "from account where lower(email) = lower(?)")
+                    + "from account where lower(email) = lower(?)"
+                )
                 .authoritiesByUsernameQuery(
                     "select email as username, role as authority "
-                    +
-                    "from account_role where lower(email) = lower(?)")
+                    + "from account_role where lower(email) = lower(?)"
+                )
                 .passwordEncoder(encoder());
     }
 

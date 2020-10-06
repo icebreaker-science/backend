@@ -67,27 +67,21 @@ public class AppErrorResponse {
             return false;
         }
         if (getTimestamp() != null
-            ?
-            !getTimestamp().equals(that.getTimestamp())
-            :
-            that.getTimestamp() != null
+            ? !getTimestamp().equals(that.getTimestamp())
+            : that.getTimestamp() != null
         ) {
             return false;
         }
         if (getError() != null
-            ?
-            !getError().equals(that.getError())
-            :
-            that.getError() != null
+            ? !getError().equals(that.getError())
+            : that.getError() != null
         ) {
             return false;
         }
 
         return getErrors() != null
-            ?
-            getErrors().equals(that.getErrors())
-            :
-            that.getErrors() == null;
+            ? getErrors().equals(that.getErrors())
+            : that.getErrors() == null;
     }
 
     @Override

@@ -109,16 +109,11 @@ public class AccountProfile {
         }
         AccountProfile that = (AccountProfile) o;
         return title.equals(that.title)
-                &&
-                forename.equals(that.forename)
-                &&
-                surname.equals(that.surname)
-                &&
-                institution.equals(that.institution)
-                &&
-                city.equals(that.city)
-                &&
-                researchArea.equals(that.researchArea);
+                && forename.equals(that.forename)
+                && surname.equals(that.surname)
+                && institution.equals(that.institution)
+                && city.equals(that.city)
+                && researchArea.equals(that.researchArea);
     }
 
 

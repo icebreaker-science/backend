@@ -15,8 +15,13 @@ public class AddDeviceAvailabilityRequest {
     private String institution;
     private String researchGroup;
 
-    public AddDeviceAvailabilityRequest(Integer deviceId, String comment,
-    String germanPostalCode, String institution, String researchGroup) {
+    public AddDeviceAvailabilityRequest(
+        Integer deviceId,
+        String comment,
+        String germanPostalCode,
+        String institution,
+        String researchGroup
+    ) {
         this.deviceId = deviceId;
         this.comment = comment;
         this.germanPostalCode = germanPostalCode;

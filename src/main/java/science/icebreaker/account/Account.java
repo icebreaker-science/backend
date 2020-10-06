@@ -89,10 +89,8 @@ public class Account implements Principal {
         }
         Account account = (Account) o;
         return Objects.equals(id, account.id)
-                &&
-                email.equals(account.email)
-                &&
-                password.equals(account.password);
+                && email.equals(account.email)
+                && password.equals(account.password);
     }
 
 

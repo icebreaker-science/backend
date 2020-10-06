@@ -100,16 +100,11 @@ public class AccountService {
         Account account = registration.getAccount();
         AccountProfile profile = registration.getProfile();
         return !profile.getForename().isBlank()
-                &&
-                !profile.getSurname().isBlank()
-                &&
-                !profile.getInstitution().isBlank()
-                &&
-                !account.getEmail().isBlank()
-                &&
-                !account.getPassword().isBlank()
-                &&
-                EmailValidator.getInstance().isValid(account.getEmail());
+                && !profile.getSurname().isBlank()
+                && !profile.getInstitution().isBlank()
+                && !account.getEmail().isBlank()
+                && !account.getPassword().isBlank()
+                && EmailValidator.getInstance().isValid(account.getEmail());
     }
 
 
@@ -186,8 +181,7 @@ public class AccountService {
         final int oneHour = 3600000; //one hour in milliseconds
         Date oneHourAgo = new Date(System.currentTimeMillis() - oneHour);
 
-        if (accountConfirmation == null
-            || accountConfirmation.getCreatedDate().before(oneHourAgo)) {
+        if (accountConfirmation == null || accountConfirmation.getCreatedDate().before(oneHourAgo)) {
             throw new AccountConfirmationException()
                     .withErrorCode(ErrorCodeEnum.ERR_ACC_006);
         }

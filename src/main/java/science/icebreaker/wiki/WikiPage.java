@@ -109,14 +109,10 @@ public class WikiPage {
         }
         WikiPage wikiPage = (WikiPage) o;
         return id == wikiPage.id
-                &&
-                type == wikiPage.type
-                &&
-                title.equals(wikiPage.title)
-                &&
-                description.equals(wikiPage.description)
-                &&
-                Objects.equals(references, wikiPage.references);
+                && type == wikiPage.type
+                && title.equals(wikiPage.title)
+                && description.equals(wikiPage.description)
+                && Objects.equals(references, wikiPage.references);
     }
 
     @Override

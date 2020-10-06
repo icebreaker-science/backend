@@ -85,8 +85,7 @@ public class DeviceAvailabilityController {
 
             //No role or id is different than the ownerId provided
             if (!(authentication.getPrincipal() instanceof Account)
-                ||
-                (((Account) authentication.getPrincipal()).getId() != ownerId)) {
+                || (((Account) authentication.getPrincipal()).getId() != ownerId)) {
                 return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
             }
         }
