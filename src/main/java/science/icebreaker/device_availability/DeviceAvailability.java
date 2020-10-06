@@ -15,31 +15,31 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="device_availability")
+@Table(name = "device_availability")
 public class DeviceAvailability {
-    
+
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id")
     private WikiPage device;
-    
+
     private String comment;
 
     private String germanPostalCode;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String institution;
 
     private String researchGroup;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    public DeviceAvailability(){}
+    public DeviceAvailability() { }
     public DeviceAvailability(
         Integer id,
         WikiPage device,

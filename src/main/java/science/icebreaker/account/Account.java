@@ -3,9 +3,14 @@ package science.icebreaker.account;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
 import java.security.Principal;
 import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 
 @Entity
@@ -76,12 +81,16 @@ public class Account implements Principal {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Account account = (Account) o;
-        return Objects.equals(id, account.id) &&
-                email.equals(account.email) &&
-                password.equals(account.password);
+        return Objects.equals(id, account.id)
+                && email.equals(account.email)
+                && password.equals(account.password);
     }
 
 

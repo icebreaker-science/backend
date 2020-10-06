@@ -24,14 +24,19 @@ import javax.mail.internet.MimeMessage;
 @Configuration
 public class MailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MailService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
 
     private final AccountService accountService;
     private final TemplateEngine mailTextTemplateEngine;
     private final JavaMailSender mailSender;
     private final MailConfigurationProperties mailProperties;
 
-    public MailService(AccountService accountService, TemplateEngine mailTextTemplateEngine, JavaMailSender mailSender, MailConfigurationProperties mailProperties) {
+    public MailService(
+        AccountService accountService,
+        TemplateEngine mailTextTemplateEngine,
+        JavaMailSender mailSender,
+        MailConfigurationProperties mailProperties
+    ) {
         this.accountService = accountService;
         this.mailTextTemplateEngine = mailTextTemplateEngine;
         this.mailSender = mailSender;
@@ -39,7 +44,8 @@ public class MailService {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void sendContactRequestMail(ContactRequest contactRequest, Account account) throws AccountNotFoundException, science.icebreaker.mail.MailException {
+    public void sendContactRequestMail(ContactRequest contactRequest, Account account)
+        throws AccountNotFoundException, science.icebreaker.mail.MailException {
         AccountProfile accountProfile = accountService.getAccountProfile(account.getId());
         Context context = new Context();
         context.setVariable("contactRequest", contactRequest);
@@ -51,14 +57,20 @@ public class MailService {
         try {
             sendMail(account.getEmail(), receiverMessage, "Device request via icebreaker.science");
             try {
-                sendMail(contactRequest.getEmail(), senderMessage, "Your device request via icebreaker.science");
+                sendMail(
+                    contactRequest.getEmail(),
+                    senderMessage,
+                    "Your device request via icebreaker.science");
             } catch (MailException e) {
-                logger.error("Exception while sending contact confirmation mail: {}", e.getMessage());
-                throw new science.icebreaker.mail.MailException("Error while sending confirmation mail.");
+                LOGGER.error(
+                    "Exception while sending contact confirmation mail: {}", e.getMessage());
+                throw new science.icebreaker.mail.MailException(
+                    "Error while sending confirmation mail.");
             }
         } catch (MailException e) {
-            logger.error("Exception while sending contact request: {}", e.getMessage());
-            throw new science.icebreaker.mail.MailException("Error while sending contact request.");
+            LOGGER.error("Exception while sending contact request: {}", e.getMessage());
+            throw new science.icebreaker.mail.MailException(
+                "Error while sending contact request.");
         }
     }
 

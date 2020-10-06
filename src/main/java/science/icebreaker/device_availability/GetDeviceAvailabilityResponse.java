@@ -9,8 +9,15 @@ public class GetDeviceAvailabilityResponse {
     private String institution;
     private String researchGroup;
 
-    public GetDeviceAvailabilityResponse(Integer id, Integer deviceId, Integer accountId, String comment, String germanPostalCode, String institution,
-        String researchGroup) {
+    public GetDeviceAvailabilityResponse(
+        Integer id,
+        Integer deviceId,
+        Integer accountId,
+        String comment,
+        String germanPostalCode,
+        String institution,
+        String researchGroup
+    ) {
         this.id = id;
         this.deviceId = deviceId;
         this.accountId = accountId;

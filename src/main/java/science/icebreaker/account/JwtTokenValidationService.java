@@ -22,7 +22,7 @@ public class JwtTokenValidationService {
     /**
      * An exception will be thrown if the token is not valid. Please look up the documentation of
      * {@link io.jsonwebtoken.JwtParser#parseClaimsJws} to see the possible RuntimeExceptions.
-     *
+     * @param jwtToken the jwt token
      * @return An account object; the password field is set to an empty string.
      */
     public Account validateJwtToken(String jwtToken) {

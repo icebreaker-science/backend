@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.3.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'science.icebreaker'
@@ -43,4 +44,18 @@ test {
 
 bootJar {
     archiveFileName = 'icebreaker-science.jar'
+}
+
+checkstyle {
+    toolVersion '8.36.1'
+    configFile file("${project.rootDir}/checkstyle/checkstyle.xml")
+    checkstyleTest.enabled = false
+}
+
+checkstyleMain {
+    source ='src/main/java'
+}
+
+checkstyleTest {
+    source ='src/test/java'
 }

@@ -4,8 +4,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
 
@@ -17,7 +22,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 import science.icebreaker.account.Account;
 import science.icebreaker.device_availability.ControllerValidators.HasFiltersConstraint;
 import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
@@ -35,7 +39,10 @@ public class DeviceAvailabilityController {
     private DeviceAvailabilityService service;
     private final MailService mailService;
 
-    public DeviceAvailabilityController(DeviceAvailabilityService service, MailService mailService) {
+    public DeviceAvailabilityController(
+        DeviceAvailabilityService service,
+        MailService mailService
+    ) {
         this.service = service;
         this.mailService = mailService;
     }
@@ -55,12 +62,12 @@ public class DeviceAvailabilityController {
             addDeviceAvailabilityRequest.getGermanPostalCode(),
             addDeviceAvailabilityRequest.getInstitution(),
             addDeviceAvailabilityRequest.getResearchGroup(),
-            (Account)principal.getPrincipal()
+            (Account) principal.getPrincipal()
         );
     }
 
     @GetMapping("/")
-    @ApiParam(name="device")
+    @ApiParam(name = "device")
     @HasFiltersConstraint
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "List of availability entries"),
@@ -68,20 +75,19 @@ public class DeviceAvailabilityController {
         @ApiResponse(code = 401, message = "The provided ownerID does not match that of the request sender")
     })
     public ResponseEntity<?> getDeviceAvailability(
-        @RequestParam(name="device", required=false) Integer deviceId,
-        @RequestParam(required=false) Integer ownerId
+        @RequestParam(name = "device", required = false) Integer deviceId,
+        @RequestParam(required = false) Integer ownerId
         ) {
-        /**
-         * Temporary workaround to disallow users from accessing other users' device availabilities
-         * TODO: when the access rights are well defined and implemented, correct this impl.
-         */
+        // Temporary workaround to disallow users from accessing other users' device availabilities
+        // todo: when the access rights are well defined and implemented, correct this impl.
         if (ownerId != null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             //No role or id is different than the ownerId provided
-            if (!(authentication.getPrincipal() instanceof Account) ||
-                    (((Account) authentication.getPrincipal()).getId() != ownerId))
+            if (!(authentication.getPrincipal() instanceof Account)
+                || (((Account) authentication.getPrincipal()).getId() != ownerId)) {
                 return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+            }
         }
         return new ResponseEntity<>(
                 service.getDeviceAvailability(

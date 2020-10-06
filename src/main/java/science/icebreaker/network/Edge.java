@@ -13,7 +13,13 @@ public class Edge {
     private String references;
 
 
-    public Edge(String node1, String node2, int weight, double normalizedWeight, String references) {
+    public Edge(
+        String node1,
+        String node2,
+        int weight,
+        double normalizedWeight,
+        String references
+    ) {
         this.node1 = node1;
         this.node2 = node2;
         this.weight = weight;

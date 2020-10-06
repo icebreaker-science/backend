@@ -18,7 +18,11 @@ public class ContactRequest {
     @NotBlank
     private final String message;
 
-    public ContactRequest(@NotNull @NotBlank String name, @Email @NotNull String email, @NotNull @NotBlank String message) {
+    public ContactRequest(
+        @NotNull @NotBlank String name,
+        @Email @NotNull String email,
+        @NotNull @NotBlank String message
+    ) {
         this.name = name;
         this.email = email;
         this.message = message;

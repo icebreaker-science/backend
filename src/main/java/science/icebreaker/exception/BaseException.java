@@ -43,22 +43,22 @@ public class BaseException extends RuntimeException {
         return args;
     }
 
-    public void setArgs(Object ...args) {
+    public void setArgs(Object... args) {
         this.args = args;
     }
 
-    public BaseException withErrorCode(ErrorCodeEnum errorCode) {
-        this.errorCode = errorCode;
+    public BaseException withErrorCode(ErrorCodeEnum errorCodeToSet) {
+        this.errorCode = errorCodeToSet;
         return this;
     }
 
-    public BaseException withStatus(HttpStatus status) {
-        this.status = status;
+    public BaseException withStatus(HttpStatus statusToSet) {
+        this.status = statusToSet;
         return this;
     }
 
-    public BaseException withArgs(Object ...args) {
-        this.args = args;
+    public BaseException withArgs(Object... argsToSet) {
+        this.args = argsToSet;
         return this;
     }
 }

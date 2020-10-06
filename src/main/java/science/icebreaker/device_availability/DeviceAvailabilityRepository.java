@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeviceAvailabilityRepository extends JpaRepository<DeviceAvailability, Integer> {
-    List<DeviceAvailability> findByDeviceId(Integer DeviceId);
+    List<DeviceAvailability> findByDeviceId(Integer deviceId);
 }

@@ -14,9 +14,9 @@ import science.icebreaker.exception.ErrorCodeEnum;
 public class HasFiltersValidator implements ConstraintValidator<HasFiltersConstraint, Object[]> {
 
     /**
-     * Given a list of params passed to a controller, checks if 
+     * Given a list of params passed to a controller, checks if
      * at least one is not null
-     * 
+     *
      * @param values The params passed
      * @param context
      * @return true if the params satisfy the validation condition.
@@ -27,8 +27,11 @@ public class HasFiltersValidator implements ConstraintValidator<HasFiltersConstr
 
         Boolean hasFilters = Arrays.asList(values).stream().anyMatch((obj) -> obj != null);
 
-        if(hasFilters) return true;
-        else throw new InvalidFiltersException()
+        if (hasFilters) {
+            return true;
+        } else {
+            throw new InvalidFiltersException()
                 .withErrorCode(ErrorCodeEnum.ERR_FILTER_001);
+        }
     }
 }
