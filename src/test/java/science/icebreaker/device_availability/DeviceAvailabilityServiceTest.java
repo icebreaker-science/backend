@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import science.icebreaker.account.Account;
+import science.icebreaker.account.*;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.account.AccountProfile;
 import science.icebreaker.account.AccountRepository;
@@ -40,6 +40,7 @@ public class DeviceAvailabilityServiceTest {
     private WikiPageRepository wikiPageRepository;
     private AccountService accountService;
     private AccountRepository accountRepository;
+    private AccountConfirmationRepository accountConfirmationRepository;
     private Account account;
 
     @MockBean
@@ -49,17 +50,21 @@ public class DeviceAvailabilityServiceTest {
     public DeviceAvailabilityServiceTest(DeviceAvailabilityService deviceAvailabilityService,
             DeviceAvailabilityController deviceAvailabilityController,
             AccountService accountService, DeviceAvailabilityRepository deviceAvailabilityRepository,
-            WikiPageRepository wikiPageRepository, AccountRepository accountRepository) {
+            WikiPageRepository wikiPageRepository, AccountRepository accountRepository,
+            AccountConfirmationRepository accountConfirmationRepository) {
         this.deviceAvailabilityService = deviceAvailabilityService;
         this.deviceAvailabilityRepository = deviceAvailabilityRepository;
         this.deviceAvailabilityController = deviceAvailabilityController;
         this.wikiPageRepository = wikiPageRepository;
         this.accountService = accountService;
         this.accountRepository = accountRepository;
+        this.accountConfirmationRepository = accountConfirmationRepository;
     }
 
     @BeforeAll
     public void setupUser() throws AccountCreationException {
+        this.accountConfirmationRepository.deleteAll();
+        this.accountRepository.deleteAll();
         doNothing().when(mailService).sendMail(anyString(), anyString(), anyString());
 
         RegistrationRequest accountInfo = RegistrationRequestMock.createRegistrationRequest(); 
