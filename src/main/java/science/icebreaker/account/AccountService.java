@@ -131,14 +131,14 @@ public class AccountService {
         // TODO Save the data in a single transaction
         try {
             Account savedAccount = accountRepository.save(account);
+            int accountId = account.getId();
+            accountRoleRepository.save(new AccountRole(account.getEmail(), "USER"));
+            profile.setAccountId(accountId);
+            accountProfileRepository.save(profile);
             saveAccountConfirmationTokenAndSendEmail(savedAccount);
         } catch (DataIntegrityViolationException e) {
             throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_001);
         }
-        int accountId = account.getId();
-        accountRoleRepository.save(new AccountRole(account.getEmail(), "USER"));
-        profile.setAccountId(accountId);
-        accountProfileRepository.save(profile);
 
         return account.getId();
     }
@@ -227,5 +227,19 @@ public class AccountService {
         String subject = "Complete Registration!";
 
         mailService.sendMail(email, message, subject);
+    }
+
+    /**
+     * Forcefully sets a disabled account to enabled
+     * CAUTION: used only for internal purposes
+     * @param email
+     */
+    public void enableAccount(String email) {
+        Account account = accountRepository.findAccountByEmail(email);
+        if (account == null) {
+            throw new AccountNotFoundException();
+        }
+        account.setEnabled(true);
+        accountRepository.save(account);
     }
 }
