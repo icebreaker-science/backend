@@ -97,6 +97,7 @@ public class ServicesTest {
     @Order(2)
     public void login_correctData_success() {
         Account account = RegistrationRequestMock.createRegistrationRequest().getAccount();
+        accountService.enableAccount(account.getEmail());
         jwtToken = accountService.login(account);
         assertThat(jwtToken).isNotBlank();
     }
