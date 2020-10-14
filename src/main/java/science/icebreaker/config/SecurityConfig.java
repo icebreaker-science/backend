@@ -84,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html", // Swagger
                         "/",
                         "/account/register",
-                        "/account/confirm",
+                        "/account/validate-email",
                         "/account/resend-confirmation-email",
                         "/account/login",
                         "/network/**"
