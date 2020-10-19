@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import science.icebreaker.account.Account;
 import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.EntryNotFoundException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.wiki.WikiPage;
@@ -126,5 +128,45 @@ public class DeviceAvailabilityService {
                                 .withErrorCode(ErrorCodeEnum.ERR_DEVICE_003)
                                 .withArgs(id)
                 );
+    }
+
+    /**
+     * Deletes the device availability entry of with a specific id
+     * belonging to a user
+     *
+     * @param id id of the entry
+     * @param owner the owner of the entry
+     */
+    @Transactional
+    public void deleteDeviceAvailability(Integer id, Account owner) {
+        Long countDeleted = this.deviceAvailabilityRepository.deleteByIdAndAccount(id, owner);
+        if (countDeleted == 0) {
+            // Details of whether this entry doesn't exist
+            // or exists but does not belong to the user should not be transparent
+            throw new EntryNotFoundException()
+                .withErrorCode(ErrorCodeEnum.ERR_DEVICE_AVAIL_001);
+        }
+    }
+
+    /**
+     * Updates a device availability entry
+     *
+     * @param id id of the entry
+     * @param account owner
+     * @param comment the comment in the entry
+     */
+    public void updateDeviceAvailability(Integer id, Account account, String comment) {
+        DeviceAvailability entry = this.deviceAvailabilityRepository
+            .findById(id)
+            .orElseThrow(() -> new EntryNotFoundException()
+                .withErrorCode(ErrorCodeEnum.ERR_DEVICE_AVAIL_001)
+            );
+
+        if (entry.getAccount().getId() != account.getId()) {
+            throw new EntryNotFoundException()
+                .withErrorCode(ErrorCodeEnum.ERR_DEVICE_AVAIL_001);
+        }
+        entry.setComment(comment);
+        this.deviceAvailabilityRepository.save(entry);
     }
 }

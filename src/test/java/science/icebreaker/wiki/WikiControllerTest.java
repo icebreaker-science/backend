@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import science.icebreaker.exception.EntityNotFoundException;
+import science.icebreaker.exception.EntryNotFoundException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -28,7 +28,7 @@ class WikiControllerTest {
 
     @Test
     @Order(1)
-    void addWikiPage_success() throws EntityNotFoundException {
+    void addWikiPage_success() throws EntryNotFoundException {
         WikiPage wikiPage = new WikiPage(WikiPage.PageType.DEVICE, "title", "description", null);
         int id = wikiController.addWikiPage(wikiPage);
         wikiPage.setId(id);

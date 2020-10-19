@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 
-import science.icebreaker.exception.EntityNotFoundException;
+import science.icebreaker.exception.EntryNotFoundException;
 
 import javax.validation.Valid;
 
@@ -61,12 +61,12 @@ public class WikiController {
         @ApiResponse(code = 200, message = "The wiki page entry"),
         @ApiResponse(code = 404, message = "Wiki page entry not found")
     })
-    public WikiPage getWikiPage(@PathVariable Integer id) throws EntityNotFoundException {
+    public WikiPage getWikiPage(@PathVariable Integer id) throws EntryNotFoundException {
         Optional<WikiPage> wikiPage = wikiPageRepository.findById(id);
         if (wikiPage.isPresent()) {
             return wikiPage.get();
         } else {
-            throw new EntityNotFoundException()
+            throw new EntryNotFoundException()
                 .withErrorCode(ErrorCodeEnum.ERR_WIKI_002)
                 .withArgs(id);
         }
