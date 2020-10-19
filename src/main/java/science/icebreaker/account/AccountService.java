@@ -3,11 +3,12 @@ package science.icebreaker.account;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collector;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -205,8 +206,8 @@ public class AccountService {
     }
 
     public void saveAccountConfirmationTokenAndSendEmail(Account account) {
-
-        String confirmationToken = UUID.randomUUID().toString();
+        final int tokenLength = 32;
+        String confirmationToken = getSecureSecret(tokenLength);
 
         AccountConfirmation accountConfirmation = new AccountConfirmation();
 
@@ -216,6 +217,24 @@ public class AccountService {
 
         accountConfirmationRepository.save(accountConfirmation);
         sendAccountConfirmationEmail(account.getEmail(), confirmationToken);
+    }
+
+    /**
+     * Generates a cryptographically secure string of with a specified length
+     * @param length
+     * @return cryptographically secure string
+     */
+    private String getSecureSecret(int length) {
+        final String tokens = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        return random.ints(length, 0, tokens.length())
+        .mapToObj(val -> tokens.charAt(val))
+        .collect(Collector.of(
+            StringBuilder::new,
+            StringBuilder::append,
+            StringBuilder::append,
+            StringBuilder::toString
+        ));
     }
 
     public void sendAccountConfirmationEmail(String email, String confirmationToken) {
