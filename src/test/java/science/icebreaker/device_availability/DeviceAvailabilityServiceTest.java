@@ -144,7 +144,7 @@ public class DeviceAvailabilityServiceTest {
     /**
      * Creates two accounts and associates 2 devices with each, then checks the
      * method response when fetching device for one user
-     * 
+     *
      * @throws AccountCreationException
      */
     @Test
@@ -224,17 +224,17 @@ public class DeviceAvailabilityServiceTest {
     }
 
     @Test
-    public void deleteDeviceAvailability_not_exists_fail() {
+    public void deleteDeviceAvailability_notExists_fail() {
         final String email = "test5@test.com";
         final String password = "letmein";
         final Integer entryID = 420;
-        Account account = accountRepository.save(new Account(null, email, password));
-        assertThatThrownBy(() -> deviceAvailabilityService.deleteDeviceAvailability(entryID, account))
+        Account ownerAccount = accountRepository.save(new Account(null, email, password));
+        assertThatThrownBy(() -> deviceAvailabilityService.deleteDeviceAvailability(entryID, ownerAccount))
                 .isInstanceOf(EntryNotFoundException.class);
     }
 
     @Test
-    public void deleteDeviceAvailability_not_own_entry_fail() {
+    public void deleteDeviceAvailability_notOwnEntry_fail() {
         final String email = "test6@test.com";
         final String otherEmail = "test7@test.com";
         final String password = "letmein";
@@ -252,7 +252,7 @@ public class DeviceAvailabilityServiceTest {
                 .isInstanceOf(EntryNotFoundException.class);
     }
 
-    public void deleteDeviceAvailability_own_entry_success() {
+    public void deleteDeviceAvailability_ownEntry_success() {
         final String email = "test8@test.com";
         final String password = "letmein";
         Account owner = new Account(null, email, password);
@@ -266,23 +266,24 @@ public class DeviceAvailabilityServiceTest {
 
         deviceAvailabilityService.deleteDeviceAvailability(deviceAvailability.getId(), owner);
 
-        Optional<DeviceAvailability> availabilityData = deviceAvailabilityRepository.findById(deviceAvailability.getId());
+        Optional<DeviceAvailability> availabilityData =
+            deviceAvailabilityRepository.findById(deviceAvailability.getId());
         assertThat(availabilityData).isEmpty();
     }
 
     @Test
-    public void updateDeviceAvailability_not_exists_fail() {
+    public void updateDeviceAvailability_notExists_fail() {
         final String email = "test9@test.com";
         final String password = "letmein";
         final Integer entryID = 420;
         final String newComment = "new comment";
-        Account account = accountRepository.save(new Account(null, email, password));
-        assertThatThrownBy(() -> deviceAvailabilityService.updateDeviceAvailability(entryID, account, newComment))
+        Account ownerAccount = accountRepository.save(new Account(null, email, password));
+        assertThatThrownBy(() -> deviceAvailabilityService.updateDeviceAvailability(entryID, ownerAccount, newComment))
                 .isInstanceOf(EntryNotFoundException.class);
     }
 
     @Test
-    public void updateDeviceAvailability_not_own_entry_fail() {
+    public void updateDeviceAvailability_notOwnEntry_fail() {
         final String email = "test10@test.com";
         final String otherEmail = "test11@test.com";
         final String password = "letmein";
@@ -303,7 +304,7 @@ public class DeviceAvailabilityServiceTest {
     }
 
     @Test
-    public void updateDeviceAvailability_own_entry_success() {
+    public void updateDeviceAvailability_ownEntry_success() {
         final String email = "test12@test.com";
         final String password = "letmein";
         final String newComment = "new comment";
