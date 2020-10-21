@@ -144,7 +144,10 @@ public class DeviceAvailabilityController {
         service.updateDeviceAvailability(
             id,
             account,
-            updateData.getComment()
+            updateData.getComment(),
+            updateData.getGermanPostalCode(),
+            updateData.getInstitution(),
+            updateData.getResearchGroup()
         );
     }
 }

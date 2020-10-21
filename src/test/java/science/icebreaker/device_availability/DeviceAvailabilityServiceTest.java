@@ -278,8 +278,14 @@ public class DeviceAvailabilityServiceTest {
         final Integer entryID = 420;
         final String newComment = "new comment";
         Account ownerAccount = accountRepository.save(new Account(null, email, password));
-        assertThatThrownBy(() -> deviceAvailabilityService.updateDeviceAvailability(entryID, ownerAccount, newComment))
-                .isInstanceOf(EntryNotFoundException.class);
+        assertThatThrownBy(() -> deviceAvailabilityService.updateDeviceAvailability(
+                entryID,
+                ownerAccount,
+                newComment,
+                null,
+                null,
+                null
+        )).isInstanceOf(EntryNotFoundException.class);
     }
 
     @Test
@@ -299,8 +305,15 @@ public class DeviceAvailabilityServiceTest {
         final int deviceAvailabilityId = deviceAvailabilityRepository.save(deviceAvailability).getId();
 
         assertThatThrownBy(
-                () -> deviceAvailabilityService.updateDeviceAvailability(deviceAvailabilityId, otherUser, newComment))
-                        .isInstanceOf(EntryNotFoundException.class);
+                () -> deviceAvailabilityService.updateDeviceAvailability(
+                        deviceAvailabilityId,
+                        otherUser,
+                        newComment,
+                        null,
+                        null,
+                        null
+                )
+        ).isInstanceOf(EntryNotFoundException.class);
     }
 
     @Test
@@ -308,6 +321,9 @@ public class DeviceAvailabilityServiceTest {
         final String email = "test12@test.com";
         final String password = "letmein";
         final String newComment = "new comment";
+        final String oldResearchGroup = "group";
+        final String newInstitution = "new inst";
+        final String newPostalCode = "88888";
         Account owner = new Account(null, email, password);
         WikiPage device = new WikiPage(PageType.DEVICE, "title", "description", "refs");
 
@@ -319,13 +335,23 @@ public class DeviceAvailabilityServiceTest {
             "comment",
             "99999",
             "Somewhere",
-            "SomeStuff",
+            oldResearchGroup,
             owner
         );
         deviceAvailability = deviceAvailabilityRepository.save(deviceAvailability);
         
-        deviceAvailabilityService.updateDeviceAvailability(deviceAvailability.getId(), owner, newComment);
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                owner,
+                newComment,
+                newPostalCode,
+                newInstitution,
+                oldResearchGroup
+        );
         deviceAvailability = deviceAvailabilityRepository.findById(deviceAvailability.getId()).get();
         assertThat(deviceAvailability.getComment()).isEqualTo(newComment);
+        assertThat(deviceAvailability.getGermanPostalCode()).isEqualTo(newPostalCode);
+        assertThat(deviceAvailability.getInstitution()).isEqualTo(newInstitution);
+        assertThat(deviceAvailability.getResearchGroup()).isEqualTo(oldResearchGroup);
     }
 }

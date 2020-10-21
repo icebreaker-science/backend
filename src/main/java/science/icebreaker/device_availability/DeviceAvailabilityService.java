@@ -154,8 +154,18 @@ public class DeviceAvailabilityService {
      * @param id id of the entry
      * @param account owner
      * @param comment the comment in the entry
+     * @param germanPostalCode the postal code
+     * @param institution the intitution
+     * @param researchGroup the research group
      */
-    public void updateDeviceAvailability(Integer id, Account account, String comment) {
+    public void updateDeviceAvailability(
+        Integer id,
+        Account account,
+        String comment,
+        String germanPostalCode,
+        String institution,
+        String researchGroup
+    ) {
         DeviceAvailability entry = this.deviceAvailabilityRepository
             .findById(id)
             .orElseThrow(() -> new EntryNotFoundException()
@@ -166,7 +176,18 @@ public class DeviceAvailabilityService {
             throw new EntryNotFoundException()
                 .withErrorCode(ErrorCodeEnum.ERR_DEVICE_AVAIL_001);
         }
-        entry.setComment(comment);
+        if (comment != null) {
+            entry.setComment(comment);
+        }
+        if (germanPostalCode != null) {
+            entry.setGermanPostalCode(germanPostalCode);
+        }
+        if (institution != null) {
+            entry.setInstitution(institution);
+        }
+        if (researchGroup != null) {
+            entry.setResearchGroup(researchGroup);
+        }
         this.deviceAvailabilityRepository.save(entry);
     }
 }
