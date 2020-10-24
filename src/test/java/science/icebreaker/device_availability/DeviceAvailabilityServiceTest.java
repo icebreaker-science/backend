@@ -1,33 +1,28 @@
 package science.icebreaker.device_availability;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import science.icebreaker.account.*;
 import science.icebreaker.exception.AccountCreationException;
-import science.icebreaker.account.AccountProfile;
-import science.icebreaker.account.AccountRepository;
-import science.icebreaker.account.AccountService;
-import science.icebreaker.account.RegistrationRequest;
-import science.icebreaker.account.RegistrationRequestMock;
-import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.mail.MailException;
 import science.icebreaker.mail.MailService;
 import science.icebreaker.wiki.WikiPage;
 import science.icebreaker.wiki.WikiPageRepository;
 
 import javax.validation.ConstraintViolationException;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-
 import java.util.List;
+import java.util.concurrent.FutureTask;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -65,9 +60,9 @@ public class DeviceAvailabilityServiceTest {
     public void setupUser() throws AccountCreationException {
         this.accountConfirmationRepository.deleteAll();
         this.accountRepository.deleteAll();
-        doNothing().when(mailService).sendMail(anyString(), anyString(), anyString());
+        doReturn(new FutureTask<Void>(() -> null)).when(mailService).sendMail(anyString(), anyString(), anyString());
 
-        RegistrationRequest accountInfo = RegistrationRequestMock.createRegistrationRequest(); 
+        RegistrationRequest accountInfo = RegistrationRequestMock.createRegistrationRequest();
         Integer id = this.accountService.createAccount(accountInfo);
         Account account = new Account();
         account.setId(id);
@@ -129,9 +124,9 @@ public class DeviceAvailabilityServiceTest {
         this.deviceAvailabilityRepository.save(
             new DeviceAvailability(2, device, "comment", "67660", "TUM", "Informatik People", this.account));
 
-        List<DeviceAvailability> deviceAvailabilityList = 
+        List<DeviceAvailability> deviceAvailabilityList =
             this.deviceAvailabilityService.getDeviceAvailability(device.getId(), null);
-            
+
         assertThat(deviceAvailabilityList.size()).isEqualTo(2);
     }
 
@@ -139,7 +134,7 @@ public class DeviceAvailabilityServiceTest {
     public void getDeviceAvailability_empty_success() {
         Integer deviceId = 1;
 
-        List<DeviceAvailability> deviceAvailabilityList = 
+        List<DeviceAvailability> deviceAvailabilityList =
             this.deviceAvailabilityService.getDeviceAvailability(deviceId, null);
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(0);
@@ -147,7 +142,7 @@ public class DeviceAvailabilityServiceTest {
 
     @Test
     public void getDeviceAvailabilityOfUser_empty_success() {
-        List<DeviceAvailability> deviceAvailabilityList = 
+        List<DeviceAvailability> deviceAvailabilityList =
             this.deviceAvailabilityService.getDeviceAvailability(null, this.account.getId());
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(0);
@@ -158,7 +153,7 @@ public class DeviceAvailabilityServiceTest {
      * method response when fetching device for one user
      * @throws AccountCreationException
      */
-    @Test 
+    @Test
     public void getDeviceAvailabilityOfUser_exists_success() throws AccountCreationException {
         RegistrationRequest request = new RegistrationRequest();
         Account account = new Account(null, "test2@test.com", "secure");
