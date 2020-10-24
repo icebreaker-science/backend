@@ -2,6 +2,8 @@ package science.icebreaker.wiki;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import science.icebreaker.media.Media;
+
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -13,8 +15,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
 import java.util.Objects;
 
 @Entity
@@ -43,6 +47,9 @@ public class WikiPage {
     @Column(name = "reference") // references is a reserved key word
     private String references;
 
+    @OneToOne
+    private Media media;
+
     public WikiPage() {
     }
 
@@ -52,10 +59,21 @@ public class WikiPage {
         @NotNull @NotBlank String description,
         @Nullable String references
     ) {
+        this(type, title, description, references, null);
+    }
+
+    public WikiPage(
+        @NotNull PageType type,
+        @NotNull @NotBlank String title,
+        @NotNull @NotBlank String description,
+        @Nullable String references,
+        @Nullable Media media
+    ) {
         this.type = type;
         this.title = title;
         this.description = description;
         this.references = references;
+        this.media = media;
     }
 
     public void setId(int id) {
@@ -99,6 +117,14 @@ public class WikiPage {
         this.references = references;
     }
 
+    public Media getMedia() {
+        return media;
+    }
+
+    public void setMedia(Media media) {
+        this.media = media;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -134,4 +160,5 @@ public class WikiPage {
             return PageType.valueOf(source.toUpperCase());
         }
     }
+
 }

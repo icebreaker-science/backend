@@ -30,7 +30,7 @@ class WikiControllerTest {
     @Order(1)
     void addWikiPage_success() throws EntryNotFoundException {
         WikiPage wikiPage = new WikiPage(WikiPage.PageType.DEVICE, "title", "description", null);
-        int id = wikiController.addWikiPage(wikiPage);
+        int id = wikiController.addWikiPage(wikiPage, null);
         wikiPage.setId(id);
         WikiPage savedPage = wikiController.getWikiPage(id);
         assertThat(wikiPage).isEqualTo(savedPage);
@@ -42,13 +42,13 @@ class WikiControllerTest {
         //empty title
         assertThatThrownBy(() -> {
             WikiPage fail1 = new WikiPage(WikiPage.PageType.DEVICE, "", "description", null);
-            wikiController.addWikiPage(fail1);
+            wikiController.addWikiPage(fail1, null);
         }).isInstanceOf(ConstraintViolationException.class);
 
         //empty description
         assertThatThrownBy(() -> {
             WikiPage fail1 = new WikiPage(WikiPage.PageType.DEVICE, "title", "", null);
-            wikiController.addWikiPage(fail1);
+            wikiController.addWikiPage(fail1, null);
         }).isInstanceOf(ConstraintViolationException.class);
     }
 }

@@ -39,12 +39,20 @@ CREATE TABLE account_profile (
   FOREIGN KEY (account_id) REFERENCES account (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE media (
+  id SERIAL PRIMARY KEY,
+  original_name TEXT NOT NULL,
+  mime_type TEXT NOT NULL
+);
+
 CREATE TABLE wiki_page (
   id SERIAL PRIMARY KEY,
   type TEXT NOT NULL,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  reference TEXT
+  media_id integer,
+  reference TEXT,
+  FOREIGN KEY (media_id) REFERENCES media (id)
 );
 
 
