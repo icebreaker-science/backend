@@ -1,5 +1,6 @@
 package science.icebreaker.media;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,23 +14,25 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/internal/media")
 public class MediaController {
 
-    private final String redirectHeader = "X-Accel-Redirect";
+    private final String redirectHeader;
+    private final String redirectURI;
 
-    private MediaService mediaService;
-
-    public MediaController(MediaService mediaService) {
-        this.mediaService = mediaService;
+    public MediaController(
+        @Value("${icebreaker.files.redirectHeader}") String redirectHeader,
+        @Value("${icebreaker.files.redirectURI}") String redirectURI
+    ) {
+        this.redirectHeader = redirectHeader;
+        this.redirectURI = redirectURI;
     }
 
-    @ApiOperation(value = "Redirects internal media queries. only for internal use", hidden = true)
+    @ApiOperation(value = "Redirects internal media requests. only for internal use", hidden = true)
     @GetMapping("/{id}")
     public ResponseEntity<?> getMedia(@PathVariable Integer id) {
         //optional todo: check media entities first for existence
-        String fileLocation = this.mediaService.getMediaLocation(id.toString()).toString();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(
             redirectHeader,
-            fileLocation
+            this.redirectURI + id
         );
 
         return ResponseEntity.ok()
