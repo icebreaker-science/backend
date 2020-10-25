@@ -2,7 +2,6 @@ package science.icebreaker.account;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,11 +13,12 @@ import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.BaseException;
 import science.icebreaker.mail.MailService;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import java.util.concurrent.FutureTask;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 
 /**
@@ -50,7 +50,7 @@ public class ServicesTest {
     @Order(1)
     public void createAccount_validInput_success() throws AccountCreationException {
         RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
-        doNothing().when(mailService).sendMail(anyString(), anyString(), anyString());
+        doReturn(new FutureTask<Void>(() -> null)).when(mailService).sendMail(anyString(), anyString(), anyString());
         accountService.createAccount(request);
     }
 
