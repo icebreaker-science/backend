@@ -19,6 +19,9 @@ import science.icebreaker.exception.AccountNotFoundException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 @Configuration
@@ -30,6 +33,8 @@ public class MailService {
     private final TemplateEngine mailTextTemplateEngine;
     private final JavaMailSender mailSender;
     private final MailConfigurationProperties mailProperties;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public MailService(
         AccountService accountService,
@@ -74,7 +79,7 @@ public class MailService {
         }
     }
 
-    public void sendMail(String receiver, String message, String subject) throws MailException {
+    public Future<Void> sendMail(String receiver, String message, String subject) throws MailException {
         final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
         final MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
         try {
@@ -87,6 +92,14 @@ public class MailService {
         } catch (MessagingException e) {
             throw new MailPreparationException("Error sending mail", e);
         }
-        this.mailSender.send(mimeMessage);
+
+        return executorService.submit(() -> {
+            try {
+                this.mailSender.send(mimeMessage);
+            } catch (Exception e) {
+                LOGGER.error("Failed to send a mail: receiver=" + receiver + "; subject=" + subject, e);
+            }
+            return null;
+        });
     }
 }
