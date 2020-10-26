@@ -78,10 +78,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .cors().and()
             .authorizeRequests()
                 .antMatchers(
-                        "/v2/api-docs",
+                        "/v3/api-docs",
                         "/webjars/**",
                         "/swagger-resources/**",
-                        "/swagger-ui.html", // Swagger
+                        "/swagger-ui/**", // Swagger
                         "/",
                         "/account/register",
                         "/account/validate-email",
