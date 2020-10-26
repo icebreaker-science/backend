@@ -1,6 +1,6 @@
 # Icebreaker Backend
 
-The default port is `9090`. Open `http://localhost:9090` to find a welcome message and navigate to `http://localhost:9090/swagger-ui.html` for the Swagger UI.
+The default port is `9090`. Open `http://localhost:9090` to find a welcome message and navigate to `http://localhost:9090/swagger-ui/` for the Swagger UI.
 
 ## Setup
 
