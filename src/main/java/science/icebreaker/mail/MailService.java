@@ -2,6 +2,7 @@ package science.icebreaker.mail;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailPreparationException;
@@ -29,7 +30,7 @@ public class MailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
 
-    private final AccountService accountService;
+    private AccountService accountService;
     private final TemplateEngine mailTextTemplateEngine;
     private final JavaMailSender mailSender;
     private final MailConfigurationProperties mailProperties;
@@ -37,12 +38,10 @@ public class MailService {
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public MailService(
-        AccountService accountService,
         TemplateEngine mailTextTemplateEngine,
         JavaMailSender mailSender,
         MailConfigurationProperties mailProperties
     ) {
-        this.accountService = accountService;
         this.mailTextTemplateEngine = mailTextTemplateEngine;
         this.mailSender = mailSender;
         this.mailProperties = mailProperties;
@@ -101,5 +100,10 @@ public class MailService {
             }
             return null;
         });
+    }
+
+    @Autowired
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
     }
 }
