@@ -15,6 +15,9 @@ public class Media {
 
     private String originalName;
 
+    public Media() {
+    }
+
     public Media(
         String mimeType,
         String originalName
