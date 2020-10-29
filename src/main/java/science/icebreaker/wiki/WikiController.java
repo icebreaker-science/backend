@@ -42,7 +42,7 @@ public class WikiController {
             @ApiResponse(code = 400, message = "Parameters not valid")})
     public int addWikiPage(
         @ModelAttribute @Valid WikiPage wikiPage,
-        @RequestParam MultipartFile image
+        @RequestParam(required = false) MultipartFile image
     )
     throws IllegalRequestParameterException {
         // prevent modification of existing wiki pages
