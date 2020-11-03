@@ -87,7 +87,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/account/validate-email",
                         "/account/resend-confirmation-email",
                         "/account/login",
-                        "/network/**"
+                        "/network/**",
+                        "/internal/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.POST,
                     "/device-availability/{id:[0-9]+}/contact"

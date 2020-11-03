@@ -48,9 +48,7 @@ public class AccountService {
 
     private final AccountConfirmationRepository accountConfirmationRepository;
 
-    @Autowired
     private MailService mailService;
-
 
     public AccountService(
             AccountRepository accountRepository,
@@ -260,5 +258,10 @@ public class AccountService {
         }
         account.setEnabled(true);
         accountRepository.save(account);
+    }
+
+    @Autowired
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
     }
 }
