@@ -8,27 +8,24 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.nio.file.Files;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import science.icebreaker.config.FileStorageConfigurationProperties;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.StorageException;
 
 @Service
 public class MediaService {
-    private final String fileDirectory;
-    private final List<String> allowedTypes;
     private MediaRepository repository;
+    private FileStorageConfigurationProperties fileStorageProps;
 
     public MediaService(
-        @Value("${icebreaker.files.dir}") String fileDir,
-        @Value("#{'${icebreaker.files.allowedTypes}'.split(',')}") List<String> allowedTypes,
+        FileStorageConfigurationProperties fileStorageProps,
         MediaRepository repository
     ) {
-        this.fileDirectory = fileDir;
-        this.allowedTypes = allowedTypes;
+        this.fileStorageProps = fileStorageProps;
         this.repository = repository;
     }
 
@@ -39,7 +36,7 @@ public class MediaService {
      */
     public Path getMediaLocation(String fileName) {
         return Paths
-            .get(fileDirectory
+            .get(this.fileStorageProps.getDirectory()
                 + File.separator
                 + StringUtils.cleanPath(fileName)
             );
@@ -72,7 +69,7 @@ public class MediaService {
         String mimeType = file.getContentType();
 
         // Global allowed types or optional selected allowedTypes
-        if (!this.allowedTypes.contains(mimeType)
+        if (!this.fileStorageProps.getAllowedTypes().contains(mimeType)
             || (fileAllowedTypes != null && fileAllowedTypes.contains(mimeType))) {
             throw new StorageException()
                 .withErrorCode(ErrorCodeEnum.ERR_STRG_002);
