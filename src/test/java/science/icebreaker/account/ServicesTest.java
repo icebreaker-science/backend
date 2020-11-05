@@ -1,24 +1,20 @@
 package science.icebreaker.account;
 
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.BaseException;
-import science.icebreaker.mail.MailService;
-
-import java.util.concurrent.FutureTask;
+import science.icebreaker.util.mock.RegistrationRequestMock;
+import science.icebreaker.util.TestHelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
 
 /**
@@ -27,45 +23,38 @@ import static org.mockito.Mockito.doReturn;
 @ActiveProfiles("test")
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS) //reset context and db before test
+@Transactional
+@SuppressWarnings("ConstantConditions")
 public class ServicesTest {
 
     private final AccountService accountService;
-
     private final JwtTokenValidationService jwtTokenValidationService;
-
-    @MockBean
-    private MailService mailService;
-
-    private String jwtToken;
+    private final TestHelper testHelper;
 
 
     @Autowired
-    public ServicesTest(AccountService accountService, JwtTokenValidationService jwtTokenValidationService, MailService mailService) {
+    public ServicesTest(AccountService accountService, JwtTokenValidationService jwtTokenValidationService, TestHelper testHelper) {
         this.accountService = accountService;
         this.jwtTokenValidationService = jwtTokenValidationService;
+        this.testHelper = testHelper;
     }
 
 
     @Test
-    @Order(1)
     public void createAccount_validInput_success() throws AccountCreationException {
-        RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
-        doReturn(new FutureTask<Void>(() -> null)).when(mailService).sendMail(anyString(), anyString(), anyString());
-        accountService.createAccount(request);
+        testHelper.createAccount();
     }
 
 
     @Test
-    @Order(2)
     public void createAccount_emailAlreadyExist_failure() {
-        RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
-        assertThatThrownBy(() -> accountService.createAccount(request))
-                .isInstanceOf(AccountCreationException.class);
+        testHelper.createAccount();
+        assertThatThrownBy(testHelper::createAccount)
+                .isInstanceOf(AccountCreationException.class); // create account twice
     }
 
 
     @Test
-    @Order(2)
     public void createAccount_invalidInput_failure() {
         // ID is not null.
         RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
@@ -94,18 +83,16 @@ public class ServicesTest {
 
 
     @Test
-    @Order(2)
     public void login_correctData_success() {
-        Account account = RegistrationRequestMock.createRegistrationRequest().getAccount();
-        accountService.enableAccount(account.getEmail());
-        jwtToken = accountService.login(account);
+        String jwtToken = testHelper.createAndLoginAccount();
         assertThat(jwtToken).isNotBlank();
     }
 
 
     @Test
-    @Order(2)
     public void login_wrongData_failure() {
+        testHelper.createAccount();
+
         // Non-existing email
         Account account = RegistrationRequestMock.createRegistrationRequest().getAccount();
         account.setEmail("wrong@email.de");
@@ -127,16 +114,15 @@ public class ServicesTest {
 
 
     @Test
-    @Order(2)
     public void getAccountProfile_idExists_success() throws AccountNotFoundException {
+        Account account = testHelper.createAccount();
         AccountProfile correctProfile = RegistrationRequestMock.createRegistrationRequest().getProfile();
-        AccountProfile accountProfile = accountService.getAccountProfile(1);
+        AccountProfile accountProfile = accountService.getAccountProfile(account.getId());
         assertThat(accountProfile).isEqualTo(correctProfile);
     }
 
 
     @Test
-    @Order(2)
     public void getAccountProfile_idDoesNotExist_failure() {
         assertThatThrownBy(() -> accountService.getAccountProfile(111))
                 .isInstanceOf(AccountNotFoundException.class);
@@ -144,12 +130,12 @@ public class ServicesTest {
 
 
     @Test
-    @Order(3)
     public void validateJwtToken_correctToken_success() {
-        login_correctData_success();
+        Account loginData = RegistrationRequestMock.createRegistrationRequest().getAccount();
+        String jwtToken = testHelper.createAndLoginAccount();
         Account account = jwtTokenValidationService.validateJwtToken(jwtToken);
         assertThat(account.getEmail())
-                .isEqualTo(RegistrationRequestMock.createRegistrationRequest().getAccount().getEmail());
+                .isEqualTo(loginData.getEmail());
     }
 
 
@@ -158,8 +144,8 @@ public class ServicesTest {
      * an actual security test!
      */
     @Test
-    @Order(3)
     public void validateJwtToken_simpleWrongToken_failure() {
+        String jwtToken = testHelper.createAndLoginAccount();
         assertThatThrownBy(() -> jwtTokenValidationService.validateJwtToken(jwtToken + "x"));
     }
 }
