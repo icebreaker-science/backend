@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import science.icebreaker.exception.AccountConfirmationException;
 import science.icebreaker.exception.AccountCreationException;
@@ -113,6 +114,7 @@ public class AccountService {
      * @return The ID of the new account
      * @throws AccountCreationException If data is missing or if the ID fields are not null.
      */
+    @Transactional
     public int createAccount(RegistrationRequest registration) throws AccountCreationException {
         Account account = registration.getAccount();
         AccountProfile profile = registration.getProfile();
