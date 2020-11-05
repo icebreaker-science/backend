@@ -17,7 +17,6 @@ public class FileStorageConfigurationProperties {
     /**
      * A list of file mime types allowed
      */
-    //@Value("#{'${icebreaker.files.allowedTypes}'.split(',')}") List<String> allowedTypes,
     private List<String> allowedTypes;
 
     /**
