@@ -43,6 +43,8 @@ public class AccountService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final String hostUrl;
+
     private final String jwtSecret;
 
     private final long jwtTokenValidityMs;
@@ -57,6 +59,7 @@ public class AccountService {
             AccountProfileRepository accountProfileRepository,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
+            @Value("${icebreaker.host}") String hostUrl,
             @Value("${icebreaker.jwt-secret}") String jwtSecret,
             @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs,
             AccountConfirmationRepository accountConfirmationRepository) {
@@ -65,6 +68,7 @@ public class AccountService {
         this.accountProfileRepository = accountProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.hostUrl = hostUrl;
         this.jwtSecret = jwtSecret;
         this.jwtTokenValidityMs = jwtTokenValidityMs;
         this.accountConfirmationRepository = accountConfirmationRepository;
@@ -242,7 +246,7 @@ public class AccountService {
         //TODO
         // change email template, this is only for testing
         String message = "To confirm your account, please click here : "
-                + "https://{host}/validate-email?key=" + confirmationToken;
+                + hostUrl + "/validate-email?key=" + confirmationToken;
         String subject = "Complete Registration!";
 
         mailService.sendMail(email, message, subject);

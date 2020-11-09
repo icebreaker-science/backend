@@ -15,6 +15,13 @@ public class ApplicationConfigurationProperties {
      */
     private boolean development;
 
+
+    /**
+     * The host url of the website (frontend).
+     */
+    private String host;
+
+
     /**
      * This secret will be used to sign the JWT tokens.
      */
@@ -33,6 +40,16 @@ public class ApplicationConfigurationProperties {
 
     public void setDevelopment(boolean development) {
         this.development = development;
+    }
+
+
+    public String getHost() {
+        return host;
+    }
+
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
 
