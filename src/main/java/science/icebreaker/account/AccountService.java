@@ -252,20 +252,6 @@ public class AccountService {
         mailService.sendMail(email, message, subject);
     }
 
-    /**
-     * Forcefully sets a disabled account to enabled
-     * CAUTION: used only for internal purposes
-     * @param email
-     */
-    public void enableAccount(String email) {
-        Account account = accountRepository.findAccountByEmail(email);
-        if (account == null) {
-            throw new AccountNotFoundException();
-        }
-        account.setEnabled(true);
-        accountRepository.save(account);
-    }
-
     @Autowired
     public void setMailService(MailService mailService) {
         this.mailService = mailService;
