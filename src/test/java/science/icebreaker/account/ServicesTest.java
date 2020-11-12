@@ -7,9 +7,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import science.icebreaker.data.request.RegistrationRequest;
+import science.icebreaker.dao.entity.Account;
+import science.icebreaker.dao.entity.AccountProfile;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.BaseException;
+import science.icebreaker.service.AccountService;
+import science.icebreaker.service.JwtTokenValidationService;
 import science.icebreaker.util.mock.RegistrationRequestMock;
 import science.icebreaker.util.TestHelper;
 

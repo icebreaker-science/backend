@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import org.springframework.transaction.annotation.Transactional;
+import science.icebreaker.controller.WikiController;
+import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.exception.EntryNotFoundException;
 
 import javax.validation.ConstraintViolationException;

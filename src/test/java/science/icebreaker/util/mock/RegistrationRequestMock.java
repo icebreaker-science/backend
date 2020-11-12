@@ -1,8 +1,8 @@
 package science.icebreaker.util.mock;
 
-import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountProfile;
-import science.icebreaker.account.RegistrationRequest;
+import science.icebreaker.dao.entity.Account;
+import science.icebreaker.dao.entity.AccountProfile;
+import science.icebreaker.data.request.RegistrationRequest;
 
 public class RegistrationRequestMock {
 

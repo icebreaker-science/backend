@@ -22,13 +22,13 @@ import javax.sql.DataSource;
  * The security / authentication concept is as follows:
  *
  * Registration: To create a new account, /account/register
- * ({@link science.icebreaker.account.AccountController#register(RegistrationRequest)}
+ * ({@link AccountController#register(RegistrationRequest)}
  * has to be called. After validating the data, it will use the password encoder defined
  * in this class to encode the password
  * and store the account information in to the database.
  *
  * Login: A login will be initiated through the /account/login endpoint
- * ({@link science.icebreaker.account.AccountController#login(Account)}.
+ * ({@link AccountController#login(Account)}.
  * If the {@link AuthenticationManager} manager provided in this class verifies the login data,
  * a JWT token will be
  * generated and sent back in the response.

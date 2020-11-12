@@ -5,10 +5,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import science.icebreaker.account.Account;
-import science.icebreaker.account.AccountRole;
-import science.icebreaker.account.AccountRoleRepository;
-import science.icebreaker.account.JwtTokenValidationService;
+import science.icebreaker.dao.entity.Account;
+import science.icebreaker.dao.entity.AccountRole;
+import science.icebreaker.dao.repository.AccountRoleRepository;
+import science.icebreaker.service.JwtTokenValidationService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
