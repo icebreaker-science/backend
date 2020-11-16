@@ -15,7 +15,7 @@ import java.io.IOException;
  * process. This class is used in {@link SecurityConfig#configure(HttpSecurity)}.
  * The only authentication process that should be allowed is through our
  * /account/login endpoint defined in
- * {@link science.icebreaker.account.AccountController#login(Account)}.
+ * {@link AccountController#login(Account)}.
  */
 public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
