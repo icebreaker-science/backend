@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,11 +33,13 @@ import science.icebreaker.data.request.UpdateDeviceAvailabilityRequest;
 import science.icebreaker.data.response.GetDeviceAvailabilityResponse;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.DeviceAvailability;
-import science.icebreaker.validation.controllerValidators.HasFiltersConstraint;
-import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.CaptchaInvalidException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.MailException;
+import science.icebreaker.service.CaptchaService;
+import science.icebreaker.validation.controllerValidators.HasFiltersConstraint;
 import science.icebreaker.service.MailService;
 import science.icebreaker.service.DeviceAvailabilityService;
 import springfox.documentation.annotations.ApiIgnore;
@@ -48,13 +51,15 @@ public class DeviceAvailabilityController {
 
     private DeviceAvailabilityService service;
     private final MailService mailService;
+    private final CaptchaService captchaService;
 
     public DeviceAvailabilityController(
-        DeviceAvailabilityService service,
-        MailService mailService
-    ) {
+            DeviceAvailabilityService service,
+            MailService mailService,
+            CaptchaService captchaService) {
         this.service = service;
         this.mailService = mailService;
+        this.captchaService = captchaService;
     }
 
     @PostMapping("/")
@@ -118,8 +123,13 @@ public class DeviceAvailabilityController {
             @ApiResponse(code = 400, message = "Device availability does not exist")})
     public void sendContactRequest(
             @PathVariable int id,
-            @RequestBody @Valid ContactRequest contactRequest
-    ) throws AccountNotFoundException, DeviceAvailabilityNotFoundException, MailException {
+            @RequestBody @Valid ContactRequest contactRequest,
+            @ApiIgnore @Nullable UsernamePasswordAuthenticationToken principal
+    ) throws AccountNotFoundException, DeviceAvailabilityNotFoundException, MailException, CaptchaInvalidException {
+        if (principal == null || !principal.isAuthenticated()) {
+            captchaService.verifyCaptcha(contactRequest.getCaptcha());
+        }
+
         DeviceAvailability deviceAvailability = service.getDeviceAvailability(id);
         mailService.sendContactRequestMail(contactRequest, deviceAvailability.getAccount());
     }

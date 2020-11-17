@@ -32,6 +32,7 @@ import science.icebreaker.dao.repository.AccountRoleRepository;
 import science.icebreaker.exception.AccountConfirmationException;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
+import science.icebreaker.exception.CaptchaInvalidException;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 
@@ -61,6 +62,8 @@ public class AccountService {
 
     private MailService mailService;
 
+    private CaptchaService captchaService;
+
     public AccountService(
             AccountRepository accountRepository,
             AccountRoleRepository accountRoleRepository,
@@ -70,7 +73,8 @@ public class AccountService {
             @Value("${icebreaker.host}") String hostUrl,
             @Value("${icebreaker.jwt-secret}") String jwtSecret,
             @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs,
-            AccountConfirmationRepository accountConfirmationRepository) {
+            AccountConfirmationRepository accountConfirmationRepository,
+            CaptchaService captchaService) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
         this.accountProfileRepository = accountProfileRepository;
@@ -80,6 +84,7 @@ public class AccountService {
         this.jwtSecret = jwtSecret;
         this.jwtTokenValidityMs = jwtTokenValidityMs;
         this.accountConfirmationRepository = accountConfirmationRepository;
+        this.captchaService = captchaService;
     }
 
 
@@ -127,7 +132,8 @@ public class AccountService {
      * @throws AccountCreationException If data is missing or if the ID fields are not null.
      */
     @Transactional
-    public int createAccount(RegistrationRequest registration) throws AccountCreationException {
+    public int createAccount(RegistrationRequest registration)
+            throws AccountCreationException, CaptchaInvalidException {
         Account account = registration.getAccount();
         AccountProfile profile = registration.getProfile();
         if (account.getId() != null || profile.getAccountId() != null) {
@@ -136,6 +142,7 @@ public class AccountService {
         if (!validateRegistration(registration)) {
             throw new AccountCreationException().withErrorCode(ErrorCodeEnum.ERR_ACC_003);
         }
+        captchaService.verifyCaptcha(registration.getCaptcha());
 
         account.setEmail(account.getEmail().strip().toLowerCase());
         account.setPassword(passwordEncoder.encode(account.getPassword()));

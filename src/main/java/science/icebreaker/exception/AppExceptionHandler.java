@@ -28,7 +28,8 @@ public class AppExceptionHandler {
             AccountNotFoundException.class,
             InvalidFiltersException.class,
             DeviceAvailabilityCreationException.class,
-            IllegalRequestParameterException.class
+            IllegalRequestParameterException.class,
+            CaptchaInvalidException.class
     })
     public ResponseEntity<Object> handleExceptions(
         HttpServletRequest request,

@@ -18,6 +18,7 @@ public class RegistrationRequestMock {
 
         request.setAccount(account);
         request.setProfile(accountProfile);
+        request.setCaptcha("captcha-token");
         return request;
     }
 
@@ -33,6 +34,7 @@ public class RegistrationRequestMock {
 
         request.setAccount(account);
         request.setProfile(accountProfile);
+        request.setCaptcha("captcha-token");
         return request;
     }
 

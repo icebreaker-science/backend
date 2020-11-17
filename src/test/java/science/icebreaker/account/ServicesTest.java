@@ -13,6 +13,7 @@ import science.icebreaker.dao.entity.AccountProfile;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.BaseException;
+import science.icebreaker.exception.CaptchaInvalidException;
 import science.icebreaker.service.AccountService;
 import science.icebreaker.service.JwtTokenValidationService;
 import science.icebreaker.util.mock.RegistrationRequestMock;
@@ -84,6 +85,15 @@ public class ServicesTest {
         request4.getProfile().setForename("");
         assertThatThrownBy(() -> accountService.createAccount(request4))
                 .isInstanceOf(AccountCreationException.class);
+    }
+
+
+    @Test
+    public void createAccount_invalidCaptcha_failure() {
+        RegistrationRequest request = RegistrationRequestMock.createRegistrationRequest();
+        testHelper.mockCaptcha(false);
+        assertThatThrownBy(() -> accountService.createAccount(request))
+                .isInstanceOf(CaptchaInvalidException.class);
     }
 
 

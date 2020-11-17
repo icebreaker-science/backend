@@ -10,6 +10,8 @@ public class RegistrationRequest {
 
     private AccountProfile profile;
 
+    private String captcha;
+
 
     public Account getAccount() {
         return account;
@@ -28,5 +30,13 @@ public class RegistrationRequest {
 
     public void setProfile(AccountProfile profile) {
         this.profile = profile;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
     }
 }
