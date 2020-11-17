@@ -46,7 +46,7 @@ jobs:
 
       - name: Set environment variable "BRANCH"
         run: |
-          echo "::set-env name=BRANCH::$(eval 'echo $GITHUB_REF | sed s/refs\\/heads\\/// | sed s/\\//__/ ')"
+          echo "BRANCH=$(eval 'echo $GITHUB_REF | sed s/refs\\/heads\\/// | sed s/\\//__/ ')" >> $GITHUB_ENV
 
       - name: Build image
         run: docker build -t new_image .
