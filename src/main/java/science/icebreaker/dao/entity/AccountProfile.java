@@ -98,6 +98,9 @@ public class AccountProfile {
         this.researchArea = researchArea;
     }
 
+    public String getFullName() {
+        return String.format("%s %s %s", this.title, this.forename, this.surname);
+    }
 
     @Override
     public boolean equals(Object o) {

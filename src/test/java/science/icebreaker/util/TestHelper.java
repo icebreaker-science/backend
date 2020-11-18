@@ -1,6 +1,8 @@
 package science.icebreaker.util;
 
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.stereotype.Service;
 import science.icebreaker.data.captcha.HCaptchaResponse;
@@ -11,6 +13,7 @@ import science.icebreaker.dao.repository.AccountRepository;
 import science.icebreaker.dao.repository.DeviceAvailabilityRepository;
 import science.icebreaker.service.CaptchaService;
 import science.icebreaker.service.MailService;
+import science.icebreaker.service.TimeService;
 import science.icebreaker.service.AccountService;
 import science.icebreaker.util.mock.RegistrationRequestMock;
 import science.icebreaker.dao.entity.WikiPage;
@@ -21,6 +24,8 @@ import javax.persistence.PersistenceContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
 
 /**
  * This class collect methods used in different tests
@@ -39,6 +44,9 @@ public class TestHelper {
     @SpyBean
     private CaptchaService captchaService;
 
+    @MockBean
+    private TimeService timeService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -51,6 +59,10 @@ public class TestHelper {
         this.accountRepository = accountRepository;
         this.wikiPageRepository = wikiPageRepository;
         this.deviceAvailabilityRepository = deviceAvailabilityRepository;
+    }
+
+    public MailService getMailService() {
+        return this.mailService;
     }
 
     private Account createAccountInternal(RegistrationRequest request) {
@@ -126,5 +138,13 @@ public class TestHelper {
         } else {
             doReturn(new HCaptchaResponse()).when(captchaService).getValidationResponse(anyString());
         }
+    }
+
+    public void advanceTimeBySeconds(long seconds) {
+        when(this.timeService.now()).thenReturn(LocalDateTime.now().plusSeconds(seconds));
+    }
+
+    public void resetTime() {
+        when(this.timeService.now()).thenCallRealMethod();
     }
 }

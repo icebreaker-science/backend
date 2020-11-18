@@ -3,6 +3,7 @@ package science.icebreaker.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailPreparationException;
@@ -34,17 +35,40 @@ public class MailService {
     private final TemplateEngine mailTextTemplateEngine;
     private final JavaMailSender mailSender;
     private final MailConfigurationProperties mailProperties;
+    private final String hostUrl;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public MailService(
         TemplateEngine mailTextTemplateEngine,
         JavaMailSender mailSender,
-        MailConfigurationProperties mailProperties
+        MailConfigurationProperties mailProperties,
+        @Value("${icebreaker.host}") String hostUrl
     ) {
         this.mailTextTemplateEngine = mailTextTemplateEngine;
         this.mailSender = mailSender;
         this.mailProperties = mailProperties;
+        this.hostUrl = hostUrl;
+    }
+
+    /**
+     * Sends a reset password token to the given account
+     * @param token the token to send
+     * @param account the account to send to
+     */
+    public void sendResetPasswordRequest(String token, Account account) {
+        // todo: finding the profile should not be the responsibility of the mail service
+        // tie the profile to the account instead.
+        AccountProfile accountProfile = accountService.getAccountProfile(account.getId());
+        Context context = new Context();
+        context.setVariable("token", token);
+        context.setVariable("host", hostUrl);
+        context.setVariable("fullName", accountProfile.getFullName());
+
+        String message = mailTextTemplateEngine.process("resetPassword", context);
+
+        final String subject = "Your password reset request";
+        sendMail(account.getEmail(), message, subject);
     }
 
     @SuppressWarnings("ConstantConditions")

@@ -1,26 +1,40 @@
 package science.icebreaker.account;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import science.icebreaker.data.request.RegistrationRequest;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.AccountProfile;
+import science.icebreaker.dao.repository.AccountRepository;
+import science.icebreaker.dao.repository.ResetPasswordTokenRepository;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.BaseException;
 import science.icebreaker.exception.CaptchaInvalidException;
+import science.icebreaker.exception.EntryNotFoundException;
 import science.icebreaker.service.AccountService;
+import science.icebreaker.service.CryptoService;
 import science.icebreaker.service.JwtTokenValidationService;
+import science.icebreaker.service.MailService;
 import science.icebreaker.util.mock.RegistrationRequestMock;
 import science.icebreaker.util.TestHelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -34,15 +48,34 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class ServicesTest {
 
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
     private final JwtTokenValidationService jwtTokenValidationService;
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+    private final CryptoService cryptoService;
     private final TestHelper testHelper;
+    private final Long resetPasswordTokenTimeout;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Autowired
-    public ServicesTest(AccountService accountService, JwtTokenValidationService jwtTokenValidationService, TestHelper testHelper) {
+    public ServicesTest(
+        AccountService accountService,
+        AccountRepository accountRepository,
+        JwtTokenValidationService jwtTokenValidationService,
+        TestHelper testHelper,
+        ResetPasswordTokenRepository resetPasswordTokenRepository,
+        CryptoService cryptoService,
+        PasswordEncoder passwordEncoder,
+        @Value("${icebreaker.account.resetPasswordDuration}") long resetPasswordTokenTimeout
+    ) {
         this.accountService = accountService;
         this.jwtTokenValidationService = jwtTokenValidationService;
         this.testHelper = testHelper;
+        this.resetPasswordTokenRepository = resetPasswordTokenRepository;
+        this.cryptoService = cryptoService;
+        this.resetPasswordTokenTimeout = resetPasswordTokenTimeout;
+        this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -162,5 +195,102 @@ public class ServicesTest {
     public void validateJwtToken_simpleWrongToken_failure() {
         String jwtToken = testHelper.createAndLoginAccount();
         assertThatThrownBy(() -> jwtTokenValidationService.validateJwtToken(jwtToken + "x"));
+    }
+
+    @Test
+    public void requestResetPassword_nonExistentAccount_failure() {
+        final String unregisteredEmail = "someone@somewhere.com";
+        assertThatThrownBy(() -> accountService.sendPasswordResetRequest(unregisteredEmail))
+            .isInstanceOf(AccountNotFoundException.class);
+    }
+
+    @Test
+    public void requestResetPassword_accountExists_success() {
+        final MailService mailService = testHelper.getMailService();
+        final Account account = testHelper.createAccount();
+
+        accountService.sendPasswordResetRequest(account.getEmail());
+
+        final ArgumentCaptor<String> tokenArg = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendResetPasswordRequest(tokenArg.capture(), eq(account));
+
+        final String generatedToken = tokenArg.getValue();
+
+        assertThat(this.resetPasswordTokenRepository.findById(generatedToken)).isNotEmpty();
+
+    }
+
+    @Test
+    public void requestResetPassword_multipleAccounts_success() {
+        final MailService mailService = testHelper.getMailService();
+        final Account account = testHelper.createAccount();
+        
+        final ArgumentCaptor<String> tokenArgs = ArgumentCaptor.forClass(String.class);
+        accountService.sendPasswordResetRequest(account.getEmail());
+        accountService.sendPasswordResetRequest(account.getEmail());
+
+        verify(mailService, times(2)).sendResetPasswordRequest(tokenArgs.capture(), eq(account));
+
+        final List<String> tokensGenerated = tokenArgs.getAllValues();
+        final String firstGeneratedToken = tokensGenerated.get(0);
+        final String secondGeneratedToken = tokensGenerated.get(1);
+
+        assertThat(this.resetPasswordTokenRepository.findById(firstGeneratedToken)).isEmpty();
+        assertThat(this.resetPasswordTokenRepository.findById(secondGeneratedToken)).isNotEmpty();
+    }
+
+    @Test
+    public void resetPassword_tokenDoesNotExist_failure() {
+        final String randomToken = this.cryptoService.getSecureSecret(32);
+        final String newPassword = "secure";
+        
+        assertThatThrownBy(() -> this.accountService.resetPassword(randomToken, newPassword))
+            .isInstanceOf(EntryNotFoundException.class);
+    }
+
+    @Test
+    public void resetPassword_tokenExpired_failure() {
+        final MailService mailService = testHelper.getMailService();
+        final Account account = testHelper.createAccount();
+        final String newPassword = "securepassword";
+
+        accountService.sendPasswordResetRequest(account.getEmail());
+
+        final ArgumentCaptor<String> tokenArg = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendResetPasswordRequest(tokenArg.capture(), eq(account));
+
+        final String generatedToken = tokenArg.getValue();
+
+        final long deadlineDuration = this.resetPasswordTokenTimeout;
+        testHelper.advanceTimeBySeconds(deadlineDuration);
+
+        assertThatThrownBy(() -> this.accountService.resetPassword(generatedToken, newPassword))
+            .isInstanceOf(EntryNotFoundException.class);
+    }
+
+
+    @Test
+    public void resetPassword_tokenExists_success() {
+        testHelper.resetTime();
+        final MailService mailService = testHelper.getMailService();
+        final Account account = testHelper.createAccount();
+        final String newPassword = "securepassword";
+
+        accountService.sendPasswordResetRequest(account.getEmail());
+
+        final ArgumentCaptor<String> tokenArg = ArgumentCaptor.forClass(String.class);
+        verify(mailService).sendResetPasswordRequest(tokenArg.capture(), eq(account));
+
+        final String generatedToken = tokenArg.getValue();
+
+        this.accountService.resetPassword(generatedToken, newPassword);
+        assertThat(
+            this.accountRepository.findById(account.getId())
+                .flatMap(modifiedAccount -> 
+                    Optional.of(this.passwordEncoder.matches(newPassword, modifiedAccount.getPassword()))
+                )
+        ).isEqualTo(Optional.of(true));
+
+        assertThat(this.resetPasswordTokenRepository.findById(generatedToken)).isEmpty();
     }
 }
