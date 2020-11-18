@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
     id 'checkstyle'
+    id "org.flywaydb.flyway" version "6.5.7"
 }
 
 group = 'science.icebreaker'
@@ -26,6 +27,7 @@ dependencies {
 
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    compile "org.flywaydb:flyway-core:6.5.7"
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.postgresql:postgresql'
