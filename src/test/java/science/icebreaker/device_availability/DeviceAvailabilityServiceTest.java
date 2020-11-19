@@ -11,10 +11,7 @@ import science.icebreaker.controller.DeviceAvailabilityController;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.DeviceAvailability;
 import science.icebreaker.dao.repository.DeviceAvailabilityRepository;
-import science.icebreaker.exception.DeviceAvailabilityCreationException;
-import science.icebreaker.exception.EntryNotFoundException;
-import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
-import science.icebreaker.exception.MailException;
+import science.icebreaker.exception.*;
 import science.icebreaker.service.DeviceAvailabilityService;
 import science.icebreaker.util.TestHelper;
 import science.icebreaker.dao.entity.WikiPage;
@@ -134,24 +131,35 @@ public class DeviceAvailabilityServiceTest {
     @Test
     public void sendContactRequest_prepare_mail_success() throws MailException {
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
-        this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest);
+        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
+        this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest, null);
     }
 
     @Test
     public void sendContactRequest_device_not_exist() {
+        testHelper.mockCaptcha(true);
         assertThatThrownBy(() -> {
-            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
-            this.deviceAvailabilityController.sendContactRequest(-1, contactRequest);
+            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
+            this.deviceAvailabilityController.sendContactRequest(-1, contactRequest, null);
         }).isInstanceOf(DeviceAvailabilityNotFoundException.class);
     }
 
     @Test
     public void sendContactRequest_request_not_valid() {
         assertThatThrownBy(() -> {
-            ContactRequest contactRequest = new ContactRequest("A", "email.icebreaker.science", "message");
-            this.deviceAvailabilityController.sendContactRequest(1, contactRequest);
+            ContactRequest contactRequest = new ContactRequest("A", "email.icebreaker.science", "message", "captcha");
+            this.deviceAvailabilityController.sendContactRequest(1, contactRequest, null);
         }).isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @Test
+    public void sendContactRequest_captcha_not_valid() {
+        DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
+        testHelper.mockCaptcha(false);
+        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
+        assertThatThrownBy(() -> {
+            this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest, null);
+        }).isInstanceOf(CaptchaInvalidException.class);
     }
 
     @Test

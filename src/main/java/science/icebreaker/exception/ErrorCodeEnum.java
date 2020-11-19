@@ -16,7 +16,9 @@ public enum ErrorCodeEnum {
     ERR_WIKI_002("ERR_WIKI_002"),
     ERR_DEVICE_AVAIL_001("ERR_DEVICE_AVAIL_001"),
     ERR_STRG_001("ERR_STRG_001"),
-    ERR_STRG_002("ERR_STRG_002");
+    ERR_STRG_002("ERR_STRG_002"),
+    ERR_CAPTCHA_001("ERR_CAPTCHA_001"),
+    ERR_CAPTCHA_002("ERR_CAPTCHA_002");
 
     public final String value;
 

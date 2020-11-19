@@ -3,11 +3,13 @@ package science.icebreaker.util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.stereotype.Service;
+import science.icebreaker.data.captcha.HCaptchaResponse;
 import science.icebreaker.data.request.RegistrationRequest;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.DeviceAvailability;
 import science.icebreaker.dao.repository.AccountRepository;
 import science.icebreaker.dao.repository.DeviceAvailabilityRepository;
+import science.icebreaker.service.CaptchaService;
 import science.icebreaker.service.MailService;
 import science.icebreaker.service.AccountService;
 import science.icebreaker.util.mock.RegistrationRequestMock;
@@ -34,6 +36,9 @@ public class TestHelper {
     @SpyBean
     private MailService mailService;
 
+    @SpyBean
+    private CaptchaService captchaService;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -50,6 +55,7 @@ public class TestHelper {
 
     private Account createAccountInternal(RegistrationRequest request) {
         doReturn(null).when(mailService).sendMail(anyString(), anyString(), anyString());
+        mockCaptcha(true);
 
         int accountId = accountService.createAccount(request);
         Account account = request.getAccount();
@@ -110,5 +116,15 @@ public class TestHelper {
         WikiPage device = createWikiPage();
         return this.deviceAvailabilityRepository.save(
                 new DeviceAvailability(device, "comment", "67660", "TU KL", "Informatik People", account));
+    }
+
+    public void mockCaptcha(boolean success) {
+        if (success) {
+            HCaptchaResponse hCaptchaResponse = new HCaptchaResponse();
+            hCaptchaResponse.setSuccess(true);
+            doReturn(hCaptchaResponse).when(captchaService).getValidationResponse(anyString());
+        } else {
+            doReturn(new HCaptchaResponse()).when(captchaService).getValidationResponse(anyString());
+        }
     }
 }
