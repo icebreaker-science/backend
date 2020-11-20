@@ -19,6 +19,7 @@ import science.icebreaker.exception.AccountNotFoundException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -75,6 +76,14 @@ public class MailService {
             throw new science.icebreaker.exception.MailException(
                 "Error while sending contact request.");
         }
+    }
+
+    public void sendTemplateMail(String receiver, String template, String subject, Map<String, String> values)
+            throws MailException {
+        Context context = new Context();
+        values.forEach(context::setVariable);
+        String message = mailTextTemplateEngine.process(template, context);
+        sendMail(receiver, message, subject);
     }
 
     public Future<Void> sendMail(String receiver, String message, String subject) throws MailException {

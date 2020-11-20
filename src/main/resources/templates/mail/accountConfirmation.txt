@@ -1,0 +1,13 @@
+Dear [(${#strings.isEmpty(title) ? '' : title + ' '})][(${surname})],
+
+To confirm your account, please click here :
+[(${hostUrl})]/validate-email?key=[(${confirmationToken})]
+
+
+Thank you for using our service. If you have any questions regarding Icebreaker, please contact us at mail@icebreaker.science.
+
+Best regards,
+Your Icebreaker-Team
+
+https://icebreaker.science/
+mail@icebreaker.science

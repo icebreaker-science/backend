@@ -235,7 +235,7 @@ public class AccountService {
         accountConfirmation.setAccount(account);
 
         accountConfirmationRepository.save(accountConfirmation);
-        sendAccountConfirmationEmail(account.getEmail(), confirmationToken);
+        sendAccountConfirmationEmail(account, confirmationToken);
     }
 
     /**
@@ -256,15 +256,18 @@ public class AccountService {
         ));
     }
 
-    public void sendAccountConfirmationEmail(String email, String confirmationToken) {
+    public void sendAccountConfirmationEmail(Account account, String confirmationToken) {
+        AccountProfile accountProfile = getAccountProfile(account.getId());
 
-        //TODO
-        // change email template, this is only for testing
-        String message = "To confirm your account, please click here : "
-                + hostUrl + "/validate-email?key=" + confirmationToken;
+        Map<String, String> templateValues = new HashMap<>();
+        templateValues.put("hostUrl", hostUrl);
+        templateValues.put("confirmationToken", confirmationToken);
+        templateValues.put("title", accountProfile.getTitle());
+        templateValues.put("surname", accountProfile.getSurname());
+
         String subject = "Complete Registration!";
 
-        mailService.sendMail(email, message, subject);
+        mailService.sendTemplateMail(account.getEmail(), "accountConfirmation", subject, templateValues);
     }
 
     @Autowired
