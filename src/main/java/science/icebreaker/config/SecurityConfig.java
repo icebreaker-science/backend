@@ -1,6 +1,7 @@
 package science.icebreaker.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
 
@@ -56,6 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationEntryPoint entryPoint = new MyAuthenticationEntryPoint();
 
+    private final boolean development;
+
     private final DataSource dataSource;
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -63,9 +69,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public SecurityConfig(
+            @Value("${icebreaker.development}") boolean development,
             DataSource dataSource,
             JwtRequestFilter jwtRequestFilter
     ) {
+        this.development = development;
         this.dataSource = dataSource;
         this.jwtRequestFilter = jwtRequestFilter;
     }
@@ -134,5 +142,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        if (development) {
+            configuration.addAllowedHeader(CorsConfiguration.ALL);
+            configuration.addAllowedMethod(CorsConfiguration.ALL);
+            configuration.addAllowedOrigin(CorsConfiguration.ALL);
+        }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
