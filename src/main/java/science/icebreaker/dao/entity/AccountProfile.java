@@ -99,7 +99,16 @@ public class AccountProfile {
     }
 
     public String getFullName() {
-        return String.format("%s %s %s", this.title, this.forename, this.surname);
+        StringBuilder builder = new StringBuilder();
+        if (this.title != null && this.title.length() > 0) {
+            builder.append(this.title);
+            builder.append(" ");
+        }
+
+        builder.append(this.forename);
+        builder.append(" ");
+        builder.append(this.surname);
+        return builder.toString();
     }
 
     @Override

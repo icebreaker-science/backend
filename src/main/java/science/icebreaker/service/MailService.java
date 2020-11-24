@@ -20,6 +20,8 @@ import science.icebreaker.exception.AccountNotFoundException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,15 +62,15 @@ public class MailService {
         // todo: finding the profile should not be the responsibility of the mail service
         // tie the profile to the account instead.
         AccountProfile accountProfile = accountService.getAccountProfile(account.getId());
-        Context context = new Context();
-        context.setVariable("token", token);
-        context.setVariable("host", hostUrl);
-        context.setVariable("fullName", accountProfile.getFullName());
+        Map<String, String> contextValues = new HashMap<String, String>();
+        contextValues.put("token", token);
+        contextValues.put("host", hostUrl);
+        contextValues.put("fullName", accountProfile.getFullName());
 
-        String message = mailTextTemplateEngine.process("resetPassword", context);
-
+        final String templateName = "resetPassword";
         final String subject = "Your password reset request";
-        sendMail(account.getEmail(), message, subject);
+
+        this.sendTemplateMail(account.getEmail(), templateName, subject, contextValues);
     }
 
     @SuppressWarnings("ConstantConditions")

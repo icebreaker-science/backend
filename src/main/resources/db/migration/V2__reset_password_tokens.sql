@@ -5,4 +5,4 @@ CREATE TABLE reset_password_token (
   FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
 );
 
-CREATE INDEX reset_password_token_account_idx ON reset_password_token (account_id);
+CREATE UNIQUE INDEX reset_password_token_account_idx ON reset_password_token (account_id);
