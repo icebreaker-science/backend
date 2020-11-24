@@ -3,12 +3,11 @@ package science.icebreaker.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collector;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +24,17 @@ import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.AccountConfirmation;
 import science.icebreaker.dao.entity.AccountProfile;
 import science.icebreaker.dao.entity.AccountRole;
+import science.icebreaker.dao.entity.ResetPasswordToken;
 import science.icebreaker.dao.repository.AccountConfirmationRepository;
 import science.icebreaker.dao.repository.AccountProfileRepository;
 import science.icebreaker.dao.repository.AccountRepository;
 import science.icebreaker.dao.repository.AccountRoleRepository;
+import science.icebreaker.dao.repository.ResetPasswordTokenRepository;
 import science.icebreaker.exception.AccountConfirmationException;
 import science.icebreaker.exception.AccountCreationException;
 import science.icebreaker.exception.AccountNotFoundException;
 import science.icebreaker.exception.CaptchaInvalidException;
+import science.icebreaker.exception.EntryNotFoundException;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 
@@ -47,6 +49,8 @@ public class AccountService {
     private final AccountRoleRepository accountRoleRepository;
 
     private final AccountProfileRepository accountProfileRepository;
+
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -63,6 +67,11 @@ public class AccountService {
     private MailService mailService;
 
     private CaptchaService captchaService;
+    private CryptoService cryptoService;
+
+    private TimeService clock;
+
+    private long resetPasswordTokenTimeout;
 
     public AccountService(
             AccountRepository accountRepository,
@@ -73,8 +82,13 @@ public class AccountService {
             @Value("${icebreaker.host}") String hostUrl,
             @Value("${icebreaker.jwt-secret}") String jwtSecret,
             @Value("${icebreaker.jwt-token-validity-ms}") long jwtTokenValidityMs,
+            @Value("${icebreaker.account.resetPasswordDuration}") long resetPasswordTokenTimeout,
             AccountConfirmationRepository accountConfirmationRepository,
-            CaptchaService captchaService) {
+            CryptoService cryptoService,
+            ResetPasswordTokenRepository resetPasswordTokenRepository,
+            TimeService clock,
+            CaptchaService captchaService
+    ) {
         this.accountRepository = accountRepository;
         this.accountRoleRepository = accountRoleRepository;
         this.accountProfileRepository = accountProfileRepository;
@@ -85,8 +99,16 @@ public class AccountService {
         this.jwtTokenValidityMs = jwtTokenValidityMs;
         this.accountConfirmationRepository = accountConfirmationRepository;
         this.captchaService = captchaService;
+        this.cryptoService = cryptoService;
+        this.resetPasswordTokenRepository = resetPasswordTokenRepository;
+        this.resetPasswordTokenTimeout = resetPasswordTokenTimeout;
+        this.clock = clock;
     }
 
+    @Autowired
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
+    }
 
     /**
      *
@@ -226,7 +248,7 @@ public class AccountService {
 
     public void saveAccountConfirmationTokenAndSendEmail(Account account) {
         final int tokenLength = 32;
-        String confirmationToken = getSecureSecret(tokenLength);
+        String confirmationToken = this.cryptoService.getSecureSecret(tokenLength);
 
         AccountConfirmation accountConfirmation = new AccountConfirmation();
 
@@ -236,24 +258,6 @@ public class AccountService {
 
         accountConfirmationRepository.save(accountConfirmation);
         sendAccountConfirmationEmail(account, confirmationToken);
-    }
-
-    /**
-     * Generates a cryptographically secure string of with a specified length
-     * @param length
-     * @return cryptographically secure string
-     */
-    private String getSecureSecret(int length) {
-        final String tokens = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        SecureRandom random = new SecureRandom();
-        return random.ints(length, 0, tokens.length())
-        .mapToObj(val -> tokens.charAt(val))
-        .collect(Collector.of(
-            StringBuilder::new,
-            StringBuilder::append,
-            StringBuilder::append,
-            StringBuilder::toString
-        ));
     }
 
     public void sendAccountConfirmationEmail(Account account, String confirmationToken) {
@@ -270,8 +274,60 @@ public class AccountService {
         mailService.sendTemplateMail(account.getEmail(), "accountConfirmation", subject, templateValues);
     }
 
-    @Autowired
-    public void setMailService(MailService mailService) {
-        this.mailService = mailService;
+    /**
+     * Finds an account by email and sends an email to that account prompting
+     * the user to change his password
+     * @param email The email of the account
+     * @throws AccountNotFoundException if the email is not associated with any account
+     */
+    @Transactional
+    public void sendPasswordResetRequest(String email) throws AccountNotFoundException {
+        Account accountToReset = this.accountRepository.findAccountByEmail(email);
+
+        // defer handling non registered emails
+        if (accountToReset == null) {
+            throw new AccountNotFoundException()
+                .withErrorCode(ErrorCodeEnum.ERR_ACC_007);
+        }
+
+        // delete previous account entry
+        this.resetPasswordTokenRepository.deleteByAccount(accountToReset);
+
+        final int tokenLength = 32;
+        String token = this.cryptoService.getSecureSecret(tokenLength);
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken(token, accountToReset);
+        this.resetPasswordTokenRepository.save(resetPasswordToken);
+
+        this.mailService.sendResetPasswordRequest(token, accountToReset);
+    }
+
+    /**
+     * Resets the password of an account given a reset password token
+     * @param resetPasswordToken The reset password token
+     * @param newPassword The new password
+     * @throws EntryNotFoundException if the given token is not registered or has expired
+     */
+    @Transactional
+    public void resetPassword(String resetPasswordToken, String newPassword) throws EntryNotFoundException {
+        ResetPasswordToken token = this.resetPasswordTokenRepository.findById(resetPasswordToken)
+            .flatMap(curToken -> {
+                final LocalDateTime deadline = curToken.getCreatedAt()
+                    .plusSeconds(this.resetPasswordTokenTimeout);
+
+                if (this.clock.now().isAfter(deadline)) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(curToken);
+                }
+            })
+            .orElseThrow(() ->
+                new EntryNotFoundException()
+                    .withErrorCode(ErrorCodeEnum.ERR_RST_PASS_001)
+            );
+
+        Account account = token.getAccount();
+        account.setPassword(passwordEncoder.encode(newPassword));
+        this.accountRepository.save(account);
+        this.resetPasswordTokenRepository.deleteById(resetPasswordToken);
     }
 }

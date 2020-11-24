@@ -98,6 +98,18 @@ public class AccountProfile {
         this.researchArea = researchArea;
     }
 
+    public String getFullName() {
+        StringBuilder builder = new StringBuilder();
+        if (this.title != null && this.title.length() > 0) {
+            builder.append(this.title);
+            builder.append(" ");
+        }
+
+        builder.append(this.forename);
+        builder.append(" ");
+        builder.append(this.surname);
+        return builder.toString();
+    }
 
     @Override
     public boolean equals(Object o) {
