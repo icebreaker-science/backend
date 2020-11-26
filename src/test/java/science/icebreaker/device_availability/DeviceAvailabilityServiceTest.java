@@ -79,7 +79,7 @@ public class DeviceAvailabilityServiceTest {
                 .save(new DeviceAvailability(2, deviceAvailability.getDevice(), "comment", "67660", "TUM", "Informatik People", deviceAvailability.getAccount()));
 
         List<DeviceAvailability> deviceAvailabilityList = this.deviceAvailabilityService
-                .getDeviceAvailability(deviceAvailability.getDevice().getId(), null);
+                .getDeviceAvailability(deviceAvailability.getDevice().getId(), null, false);
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(2);
     }
@@ -88,8 +88,9 @@ public class DeviceAvailabilityServiceTest {
     public void getDeviceAvailability_empty_success() {
         Integer deviceId = 1;
 
+        // should count 0 regardless of disabled status
         List<DeviceAvailability> deviceAvailabilityList =
-            this.deviceAvailabilityService.getDeviceAvailability(deviceId, null);
+            this.deviceAvailabilityService.getDeviceAvailability(deviceId, null, true);
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(0);
     }
@@ -98,7 +99,7 @@ public class DeviceAvailabilityServiceTest {
     public void getDeviceAvailabilityOfUser_empty_success() {
         Account account = testHelper.createAccount();
         List<DeviceAvailability> deviceAvailabilityList =
-            this.deviceAvailabilityService.getDeviceAvailability(null, account.getId());
+            this.deviceAvailabilityService.getDeviceAvailability(null, account.getId(), true);
         assertThat(deviceAvailabilityList.size()).isEqualTo(0);
     }
 
@@ -124,7 +125,7 @@ public class DeviceAvailabilityServiceTest {
                 .save(new DeviceAvailability(2, device, "comment", "67660", "TUM", "Informatik People", otherAccount));
 
         List<DeviceAvailability> deviceAvailabilityList = this.deviceAvailabilityService.getDeviceAvailability(null,
-                account.getId());
+                account.getId(), true);
 
         assertThat(deviceAvailabilityList.size()).isEqualTo(2);
     }
@@ -301,7 +302,7 @@ public class DeviceAvailabilityServiceTest {
         );
 
         List<DeviceAvailability> foundListings = deviceAvailabilityService.getDeviceAvailability(
-                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId());
+                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId(), false);
 
         assertThat(foundListings).doesNotContain(deviceAvailability);
 
@@ -316,8 +317,32 @@ public class DeviceAvailabilityServiceTest {
         );
 
         List<DeviceAvailability> secondFoundListings = deviceAvailabilityService.getDeviceAvailability(
-                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId());
+                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId(), false);
 
         assertThat(secondFoundListings).contains(deviceAvailability);
+    }
+
+    @Test
+    public void updateDeviceAvailability_set_disabled_and_get_own_entries_success() {
+        DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
+        
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                deviceAvailability.getAccount(),
+                null,
+                null,
+                null,
+                null, 
+                true
+        );
+
+        List<DeviceAvailability> foundListings = deviceAvailabilityService.getDeviceAvailability(
+                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId(), true);
+
+        List<DeviceAvailability> secondFoundListings = deviceAvailabilityService.getDeviceAvailability(
+                                deviceAvailability.getDevice().getId(), null, false);
+
+        assertThat(foundListings).contains(deviceAvailability);
+        assertThat(secondFoundListings).doesNotContain(deviceAvailability);
     }
 }

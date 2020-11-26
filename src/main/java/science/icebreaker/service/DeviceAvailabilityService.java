@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,24 +98,28 @@ public class DeviceAvailabilityService {
      *
      * @param deviceId The device id to search availabilities for
      * @param ownerId The id of the owner of the device entry
+     * @param ownEntries returns all entries regardless of disabled status
      * @return A list of the device availabilities
      */
-    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId) {
-        WikiPage device = null;
-        if (deviceId != null) {
-            device = new WikiPage();
-            device.setId(deviceId);
-        }
-        Account account = null;
-        if (ownerId != null) {
-            account = new Account();
-            account.setId(ownerId);
-        }
+    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId, boolean ownEntries) {
         DeviceAvailability availabilityEntry = new DeviceAvailability();
-        availabilityEntry.setAccount(account);
-        availabilityEntry.setDevice(device);
-        availabilityEntry.setDisabled(false);
-        return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry));
+        if (deviceId != null) {
+            WikiPage device = new WikiPage();
+            device.setId(deviceId);
+            availabilityEntry.setDevice(device);
+        }
+        if (ownerId != null) {
+            Account account = new Account();
+            account.setId(ownerId);
+            availabilityEntry.setAccount(account);
+        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues();
+        if (ownEntries) {
+            matcher = matcher.withIgnorePaths("disabled");
+        }
+
+        return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry, matcher));
     }
 
     /**

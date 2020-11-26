@@ -123,7 +123,7 @@ public class DeviceAvailability {
         this.account = account;
     }
 
-    public Boolean getDisabled() {
+    public boolean isDisabled() {
         return disabled;
     }
 
