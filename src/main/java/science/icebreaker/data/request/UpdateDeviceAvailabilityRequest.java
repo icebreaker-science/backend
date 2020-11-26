@@ -1,14 +1,14 @@
 package science.icebreaker.data.request;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class UpdateDeviceAvailabilityRequest {
 
     private String comment;
     @Pattern(regexp = "[\\d]{5}", message = "Invalid postal code")
     private String germanPostalCode;
-    @NotBlank(message = "An institution name must be provided")
+    @Size(min = 1, message = "An institution name must be provided")
     private String institution;
     private String researchGroup;
     private Boolean disabled;
