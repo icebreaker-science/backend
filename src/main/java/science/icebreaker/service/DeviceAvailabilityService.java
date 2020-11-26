@@ -98,10 +98,10 @@ public class DeviceAvailabilityService {
      *
      * @param deviceId The device id to search availabilities for
      * @param ownerId The id of the owner of the device entry
-     * @param ownEntries returns all entries regardless of disabled status
+     * @param ignoreDisabled returns all entries regardless of disabled status
      * @return A list of the device availabilities
      */
-    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId, boolean ownEntries) {
+    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId, boolean ignoreDisabled) {
         DeviceAvailability availabilityEntry = new DeviceAvailability();
         if (deviceId != null) {
             WikiPage device = new WikiPage();
@@ -115,7 +115,7 @@ public class DeviceAvailabilityService {
         }
 
         ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues();
-        if (ownEntries) {
+        if (ignoreDisabled) {
             matcher = matcher.withIgnorePaths("disabled");
         }
 
