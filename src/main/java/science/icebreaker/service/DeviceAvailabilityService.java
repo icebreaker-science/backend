@@ -113,6 +113,7 @@ public class DeviceAvailabilityService {
         DeviceAvailability availabilityEntry = new DeviceAvailability();
         availabilityEntry.setAccount(account);
         availabilityEntry.setDevice(device);
+        availabilityEntry.setDisabled(false);
         return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry));
     }
 
@@ -124,7 +125,7 @@ public class DeviceAvailabilityService {
      */
     public DeviceAvailability getDeviceAvailability(Integer id)
         throws DeviceAvailabilityNotFoundException {
-        return this.deviceAvailabilityRepository.findById(id)
+        return this.deviceAvailabilityRepository.findByIdAndDisabledFalse(id)
                 .orElseThrow(
                         () -> new DeviceAvailabilityNotFoundException()
                                 .withErrorCode(ErrorCodeEnum.ERR_DEVICE_003)
@@ -159,6 +160,7 @@ public class DeviceAvailabilityService {
      * @param germanPostalCode the postal code
      * @param institution the intitution
      * @param researchGroup the research group
+     * @param disabled listing disabled status
      */
     public void updateDeviceAvailability(
         Integer id,
@@ -166,7 +168,8 @@ public class DeviceAvailabilityService {
         String comment,
         String germanPostalCode,
         String institution,
-        String researchGroup
+        String researchGroup,
+        Boolean disabled
     ) {
         DeviceAvailability entry = this.deviceAvailabilityRepository
             .findById(id)
@@ -190,6 +193,10 @@ public class DeviceAvailabilityService {
         if (researchGroup != null) {
             entry.setResearchGroup(researchGroup);
         }
+        if (disabled != null) {
+            entry.setDisabled(disabled);
+        }
+
         this.deviceAvailabilityRepository.save(entry);
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE device_availability ADD COLUMN disabled BOOLEAN NOT NULL DEFAULT false;

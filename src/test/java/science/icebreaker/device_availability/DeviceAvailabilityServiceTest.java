@@ -15,6 +15,7 @@ import science.icebreaker.exception.*;
 import science.icebreaker.service.DeviceAvailabilityService;
 import science.icebreaker.util.TestHelper;
 import science.icebreaker.dao.entity.WikiPage;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -203,7 +204,8 @@ public class DeviceAvailabilityServiceTest {
                 newComment,
                 null,
                 null,
-                null
+                null,
+                false
         )).isInstanceOf(EntryNotFoundException.class);
     }
 
@@ -220,7 +222,8 @@ public class DeviceAvailabilityServiceTest {
                         newComment,
                         null,
                         null,
-                        null
+                        null,
+                        false
                 )
         ).isInstanceOf(EntryNotFoundException.class);
     }
@@ -239,12 +242,82 @@ public class DeviceAvailabilityServiceTest {
                 newComment,
                 newPostalCode,
                 newInstitution,
-                oldResearchGroup
+                oldResearchGroup,
+                false
         );
         deviceAvailability = deviceAvailabilityRepository.findById(deviceAvailability.getId()).get();
         assertThat(deviceAvailability.getComment()).isEqualTo(newComment);
         assertThat(deviceAvailability.getGermanPostalCode()).isEqualTo(newPostalCode);
         assertThat(deviceAvailability.getInstitution()).isEqualTo(newInstitution);
         assertThat(deviceAvailability.getResearchGroup()).isEqualTo(oldResearchGroup);
+    }
+
+    @Test
+    public void updateDeviceAvailability_disable_and_find_success() {
+        DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
+        
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                deviceAvailability.getAccount(),
+                null,
+                null,
+                null,
+                null, 
+                true
+        );
+
+        assertThatThrownBy(() ->
+            deviceAvailabilityService.getDeviceAvailability(deviceAvailability.getId())
+        ).isInstanceOf(DeviceAvailabilityNotFoundException.class);
+
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                deviceAvailability.getAccount(),
+                null,
+                null,
+                null,
+                null, 
+                false
+        );
+
+        DeviceAvailability foundAvailability = 
+            deviceAvailabilityService.getDeviceAvailability(deviceAvailability.getId());
+
+        assertThat(foundAvailability).isNotNull();
+    }
+
+    @Test
+    public void updateDeviceAvailability_disable_and_find_list_success() {
+        DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
+        
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                deviceAvailability.getAccount(),
+                null,
+                null,
+                null,
+                null, 
+                true
+        );
+
+        List<DeviceAvailability> foundListings = deviceAvailabilityService.getDeviceAvailability(
+                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId());
+
+        assertThat(foundListings).doesNotContain(deviceAvailability);
+
+        deviceAvailabilityService.updateDeviceAvailability(
+                deviceAvailability.getId(),
+                deviceAvailability.getAccount(),
+                null,
+                null,
+                null,
+                null, 
+                false
+        );
+
+        List<DeviceAvailability> secondFoundListings = deviceAvailabilityService.getDeviceAvailability(
+                                deviceAvailability.getDevice().getId(), deviceAvailability.getAccount().getId());
+
+        assertThat(secondFoundListings).contains(deviceAvailability);
     }
 }

@@ -36,6 +36,8 @@ public class DeviceAvailability {
     @JoinColumn(name = "account_id")
     private Account account;
 
+    private boolean disabled;
+
     public DeviceAvailability() { }
     public DeviceAvailability(
         Integer id,
@@ -119,6 +121,14 @@ public class DeviceAvailability {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
     }
 
 }

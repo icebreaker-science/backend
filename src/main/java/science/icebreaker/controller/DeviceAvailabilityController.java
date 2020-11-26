@@ -163,7 +163,8 @@ public class DeviceAvailabilityController {
             updateData.getComment(),
             updateData.getGermanPostalCode(),
             updateData.getInstitution(),
-            updateData.getResearchGroup()
+            updateData.getResearchGroup(),
+            updateData.isDisabled()
         );
     }
 }
