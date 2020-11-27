@@ -95,6 +95,7 @@ public class DeviceAvailabilityController {
         ) {
         // Temporary workaround to disallow users from accessing other users' device availabilities
         // todo: when the access rights are well defined and implemented, correct this impl.
+        boolean ownDevices = false;
         if (ownerId != null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -102,13 +103,15 @@ public class DeviceAvailabilityController {
             if (!(authentication.getPrincipal() instanceof Account)
                 || (((Account) authentication.getPrincipal()).getId() != ownerId)) {
                 return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+            } else {
+                ownDevices = true;
             }
         }
         return new ResponseEntity<>(
                 service.getDeviceAvailability(
                         deviceId,
                         ownerId,
-                        true
+                        ownDevices
                 )
                 .stream()
                 .map(GetDeviceAvailabilityResponse::fromEntity)

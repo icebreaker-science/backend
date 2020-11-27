@@ -10,6 +10,7 @@ public class GetDeviceAvailabilityResponse {
     private String germanPostalCode;
     private String institution;
     private String researchGroup;
+    private boolean disabled;
 
     public GetDeviceAvailabilityResponse(
         Integer id,
@@ -18,7 +19,8 @@ public class GetDeviceAvailabilityResponse {
         String comment,
         String germanPostalCode,
         String institution,
-        String researchGroup
+        String researchGroup,
+        boolean disabled
     ) {
         this.id = id;
         this.deviceId = deviceId;
@@ -27,6 +29,7 @@ public class GetDeviceAvailabilityResponse {
         this.germanPostalCode = germanPostalCode;
         this.institution = institution;
         this.researchGroup = researchGroup;
+        this.disabled = disabled;
     }
 
     public Integer getId() {
@@ -81,6 +84,14 @@ public class GetDeviceAvailabilityResponse {
         this.researchGroup = researchGroup;
     }
 
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
     public static GetDeviceAvailabilityResponse fromEntity(DeviceAvailability deviceAvailability) {
         return new GetDeviceAvailabilityResponse(
             deviceAvailability.getId(),
@@ -89,7 +100,8 @@ public class GetDeviceAvailabilityResponse {
             deviceAvailability.getComment(),
             deviceAvailability.getGermanPostalCode(),
             deviceAvailability.getInstitution(),
-            deviceAvailability.getResearchGroup()
+            deviceAvailability.getResearchGroup(),
+            deviceAvailability.isDisabled()
         );
     }
 }
