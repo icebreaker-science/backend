@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,23 +98,28 @@ public class DeviceAvailabilityService {
      *
      * @param deviceId The device id to search availabilities for
      * @param ownerId The id of the owner of the device entry
+     * @param ignoreDisabled returns all entries regardless of disabled status
      * @return A list of the device availabilities
      */
-    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId) {
-        WikiPage device = null;
-        if (deviceId != null) {
-            device = new WikiPage();
-            device.setId(deviceId);
-        }
-        Account account = null;
-        if (ownerId != null) {
-            account = new Account();
-            account.setId(ownerId);
-        }
+    public List<DeviceAvailability> getDeviceAvailability(Integer deviceId, Integer ownerId, boolean ignoreDisabled) {
         DeviceAvailability availabilityEntry = new DeviceAvailability();
-        availabilityEntry.setAccount(account);
-        availabilityEntry.setDevice(device);
-        return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry));
+        if (deviceId != null) {
+            WikiPage device = new WikiPage();
+            device.setId(deviceId);
+            availabilityEntry.setDevice(device);
+        }
+        if (ownerId != null) {
+            Account account = new Account();
+            account.setId(ownerId);
+            availabilityEntry.setAccount(account);
+        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreNullValues();
+        if (ignoreDisabled) {
+            matcher = matcher.withIgnorePaths("disabled");
+        }
+
+        return this.deviceAvailabilityRepository.findAll(Example.of(availabilityEntry, matcher));
     }
 
     /**
@@ -124,7 +130,7 @@ public class DeviceAvailabilityService {
      */
     public DeviceAvailability getDeviceAvailability(Integer id)
         throws DeviceAvailabilityNotFoundException {
-        return this.deviceAvailabilityRepository.findById(id)
+        return this.deviceAvailabilityRepository.findByIdAndDisabledFalse(id)
                 .orElseThrow(
                         () -> new DeviceAvailabilityNotFoundException()
                                 .withErrorCode(ErrorCodeEnum.ERR_DEVICE_003)
@@ -159,6 +165,7 @@ public class DeviceAvailabilityService {
      * @param germanPostalCode the postal code
      * @param institution the intitution
      * @param researchGroup the research group
+     * @param disabled listing disabled status
      */
     public void updateDeviceAvailability(
         Integer id,
@@ -166,7 +173,8 @@ public class DeviceAvailabilityService {
         String comment,
         String germanPostalCode,
         String institution,
-        String researchGroup
+        String researchGroup,
+        Boolean disabled
     ) {
         DeviceAvailability entry = this.deviceAvailabilityRepository
             .findById(id)
@@ -190,6 +198,10 @@ public class DeviceAvailabilityService {
         if (researchGroup != null) {
             entry.setResearchGroup(researchGroup);
         }
+        if (disabled != null) {
+            entry.setDisabled(disabled);
+        }
+
         this.deviceAvailabilityRepository.save(entry);
     }
 }

@@ -1,28 +1,31 @@
 package science.icebreaker.data.request;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class UpdateDeviceAvailabilityRequest {
 
     private String comment;
     @Pattern(regexp = "[\\d]{5}", message = "Invalid postal code")
     private String germanPostalCode;
-    @NotBlank(message = "An institution name must be provided")
+    @Size(min = 1, message = "An institution name must be provided")
     private String institution;
     private String researchGroup;
+    private Boolean disabled;
 
     public UpdateDeviceAvailabilityRequest() { }
     public UpdateDeviceAvailabilityRequest(
         String comment,
         String germanPostalCode,
         String institution,
-        String researchGroup
+        String researchGroup,
+        Boolean disabled
     ) {
         this.comment = comment;
         this.germanPostalCode = germanPostalCode;
         this.institution = institution;
         this.researchGroup = researchGroup;
+        this.disabled = disabled;
     }
 
     public String getComment() {
@@ -55,6 +58,14 @@ public class UpdateDeviceAvailabilityRequest {
 
     public void setResearchGroup(String researchGroup) {
         this.researchGroup = researchGroup;
+    }
+
+    public Boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
 }
