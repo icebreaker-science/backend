@@ -306,9 +306,10 @@ public class AccountService {
      * @param resetPasswordToken The reset password token
      * @param newPassword The new password
      * @throws EntryNotFoundException if the given token is not registered or has expired
+     * @return The updated account
      */
     @Transactional
-    public void resetPassword(String resetPasswordToken, String newPassword) throws EntryNotFoundException {
+    public Account resetPassword(String resetPasswordToken, String newPassword) throws EntryNotFoundException {
         ResetPasswordToken token = this.resetPasswordTokenRepository.findById(resetPasswordToken)
             .flatMap(curToken -> {
                 final LocalDateTime deadline = curToken.getCreatedAt()
@@ -329,5 +330,7 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(newPassword));
         this.accountRepository.save(account);
         this.resetPasswordTokenRepository.deleteById(resetPasswordToken);
+
+        return account;
     }
 }

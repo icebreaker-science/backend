@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.AccountProfile;
 import science.icebreaker.service.AccountService;
 import science.icebreaker.service.CaptchaService;
+import science.icebreaker.service.JwtTokenValidationService;
 import science.icebreaker.data.request.ForgotPasswordRequest;
 import science.icebreaker.data.request.RegistrationRequest;
 import science.icebreaker.data.request.ResetPasswordRequest;
@@ -36,10 +39,16 @@ public class AccountController {
 
     private final AccountService service;
     private final CaptchaService captchaService;
+    private final JwtTokenValidationService jwtService;
 
-    public AccountController(AccountService service, CaptchaService captchaService) {
+    public AccountController(
+            AccountService service,
+            CaptchaService captchaService,
+            JwtTokenValidationService jwtService
+    ) {
         this.service = service;
         this.captchaService = captchaService;
+        this.jwtService = jwtService;
     }
 
 
@@ -105,6 +114,17 @@ public class AccountController {
     public void resetPassword(
         @RequestBody @Valid ResetPasswordRequest resetPasswordRequest
     ) {
-        this.service.resetPassword(resetPasswordRequest.getToken(), resetPasswordRequest.getPassword());
+        Account account = this.service.resetPassword(
+                resetPasswordRequest.getToken(), resetPasswordRequest.getPassword());
+        jwtService.invalidateUserTokens(account.getId());
+    }
+
+    @PostMapping("/logout")
+    @ApiOperation("Invalidates the logged in user token")
+    @ApiResponse(code = 200, message = "Logged out and token invalidated")
+    public void logout(@RequestHeader (name = "Authorization") String token) {
+        final int prefixLength = 7;
+        String trimmedToken = token.substring(prefixLength);
+        jwtService.invalidateToken(trimmedToken);
     }
 }
