@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Size;
 
 
 @Entity
@@ -24,6 +25,7 @@ public class Account implements Principal {
     @Column(unique = true)
     private String email;
 
+    @Size(min = 8, max = 64)
     private String password;
 
     private Boolean isEnabled;

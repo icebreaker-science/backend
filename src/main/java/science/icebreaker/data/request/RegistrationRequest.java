@@ -1,11 +1,14 @@
 package science.icebreaker.data.request;
 
 
+import javax.validation.Valid;
+
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.AccountProfile;
 
 public class RegistrationRequest {
 
+    @Valid
     private Account account;
 
     private AccountProfile profile;
