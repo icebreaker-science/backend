@@ -44,7 +44,7 @@ public class AccountController {
 
 
     @PostMapping("/register")
-    public int register(@RequestBody RegistrationRequest registrationRequest)
+    public int register(@RequestBody @Valid RegistrationRequest registrationRequest)
     throws AccountCreationException {
         return service.createAccount(registrationRequest);
     }

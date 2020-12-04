@@ -1,6 +1,7 @@
 package science.icebreaker.data.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public class ResetPasswordRequest {
 
@@ -8,6 +9,7 @@ public class ResetPasswordRequest {
     private final String token;
 
     @NotBlank
+    @Size(min = 8, max = 64)
     private final String password;
 
     public ResetPasswordRequest(
