@@ -5,6 +5,9 @@ import org.springframework.lang.Nullable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 
@@ -98,6 +101,7 @@ public class AccountProfile {
         this.researchArea = researchArea;
     }
 
+    @JsonIgnore
     public String getFullName() {
         StringBuilder builder = new StringBuilder();
         if (this.title != null && this.title.length() > 0) {
