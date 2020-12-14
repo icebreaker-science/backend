@@ -9,14 +9,17 @@ import org.springframework.stereotype.Component;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.AccountProfile;
 import science.icebreaker.dao.entity.DeviceAvailability;
+import science.icebreaker.dao.entity.Media;
 import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.dao.entity.WikiPage.PageType;
 import science.icebreaker.dao.repository.AccountProfileRepository;
 import science.icebreaker.dao.repository.AccountRepository;
 import science.icebreaker.dao.repository.DeviceAvailabilityRepository;
+import science.icebreaker.dao.repository.MediaRepository;
 import science.icebreaker.dao.repository.WikiPageRepository;
 
 @Component
+@SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:LineLength"})
 public class ApplicationRunnerSeeder implements ApplicationRunner {
 
     private final String populateArg = "populatedb";
@@ -25,6 +28,7 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
     private final AccountProfileRepository accountProfileRepositoy;
     private final WikiPageRepository wikiPageRepository;
     private final DeviceAvailabilityRepository deviceAvailabilityRepository;
+    private final MediaRepository mediaRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -33,12 +37,14 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
         AccountProfileRepository accountProfileRepositoy,
         WikiPageRepository wikiPageRepository,
         DeviceAvailabilityRepository deviceAvailabilityRepository,
+        MediaRepository mediaRepository,
         PasswordEncoder passwordEncoder
     ) {
         this.accountRepository = accountRepository;
         this.accountProfileRepositoy = accountProfileRepositoy;
         this.wikiPageRepository = wikiPageRepository;
         this.deviceAvailabilityRepository = deviceAvailabilityRepository;
+        this.mediaRepository = mediaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -56,66 +62,78 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
     }
 
     private void predefinedRecords() {
-        Account account1 = this.createAccount("User", "One",
-            "test1@test.com", "password", "Mr.", "TU KL", "Informatik", "KL");
+        String newLine = System.getProperty("line.separator");
 
-        Account account2 = this.createAccount("User", "Two",
-            "test2@test.com", "password", "Mrs.", "TU KL", "Chemistry", "KL");
+        Account account1 = this.createAccount("Guy", "Person",
+            "guy@test.com", "securepassword", "Dr.", "TUM", "Chemistry", "Munich");
 
-        Account account3 = this.createAccount("User", "Three",
-            "test3@test.com", "password", "Mrs.", "TUM", "Informatik", "Munich");
+        Media device1Media = addMedia("image", "image/jpeg");
+        Media device2Media = addMedia("image", "image/png");
+        Media device3Media = addMedia("image", "image/jpeg");
 
-        Account account4 = this.createAccount("User", "Four",
-            "test4@test.com", "password", "Mr.", "TUM", "Chemistry", "Munich");
+        WikiPage device1 = this.createDevice("MiniFlex Rigaku",
+            String.join(newLine,
+                "Benchtop powder x-ray diffraction (XRD) instrument\n"
+                , ""
+                , "Qualitative and quantitative phase analysis of poly-crystalline materials\n"
+                , ""
+                , "- Phase identification"
+                , "- Phase quantification (phase ID)"
+                , "- Percent (%) crystallinity"
+                , "- Crystallite size and strain"
+                , "- Lattice parameter refinement"
+                , "- Rietveld refinement"
+            )
+            , "https://www.rigaku.com/products/xrd/miniflex"
+            , device1Media
+        );
 
-        WikiPage device1 = this.createDevice("Device One",
-            "The description of device one", "The references of device one");
+        WikiPage device2 = this.createDevice("Orbitrap ID-X Tribrid Mass Spectrometer",
+            String.join(newLine,
+                "**Thermo Scientific Orbitrap ID-X Tribrid Mass Spectrometer System**"
+                , ""
+                , "* Quadrupole mass filter up to 0.4 amu"
+                , "* Ultra-high-field orbitrap mass analyzer (resolution up to 500 000 FWHM)"
+                , "* Ion-routing multipole"
+                , "* Dual-pressure linear ion trap"
+            )
+            , "https://assets.thermofisher.com/TFS-Assets/CMD/brochures/br-65171-ms-orbitrap-id-x-tribrid-ms-br65171-en.pdf"
+            , device2Media
+        );
 
-        WikiPage device2 = this.createDevice("Device Two",
-            "The description of device two", "The references of device two");
+        WikiPage device3 = this.createDevice("XPS",
+            "Quantitative, qualtitative and chemical environment analysis in the UHV. Suitable for surface-measurements.",
+            String.join(newLine,
+                "Van der Heide, P. X-ray Photoelectron Spectroscopy: An introduction to Principles and Practices, ISBN 978-1-118-16292-7, Wiley"
+                , ""
+                , "Shabanova, I N; Kodolov, V I.Polymers Research Journal; Hauppauge Bd. 5, Ausg. 2,  (2011): 237-243."
+            ),
+            device3Media
+        );
 
-        WikiPage device3 = this.createDevice("Device Three",
-            "The description of device three", "The references of device three");
-
-        WikiPage device4 = this.createDevice("Device Four",
-            "The description of device four", "The references of device four");
+        WikiPage device4 = this.createDevice("Dual Beam UV/VIS Spectrometer",
+            "Dual beam UV/VIS spectrometer for measuring adsorption spectra with an integrated reference. Ideal for measuring nucleic acids, proteins and complexes with an adsorption maximum in the UV/VIS range."
+            , "Perkampus, H.-H. UV-VIS Spectroscopy and Its Applications, ISBN-13: 978-3-642-77479-9, Springer Laboratory."
+            , null
+        );
 
         DeviceAvailability availabilityDevice1Account1 = this.addDeviceAvailability(
             device1,
             account1,
-            "Comment from user1 on device1",
-            "67655",
-            "TU KL",
-            "Informatik"
+            "I am looking for new cooperation partners. If you are interested in my research topic, you are welcome to contact me by email.",
+            "85748",
+            "Technical University Munich",
+            ""
         );
 
         DeviceAvailability availabilityDevice2Account1 = this.addDeviceAvailability(
             device2,
             account1,
-            "Comment from user1 on device2",
-            "67655",
-            "TU KL",
-            "Informatik"
+            "",
+            "85748",
+            "Technical University of Munich",
+            ""
         );
-
-        DeviceAvailability availabilityDevice1Account3 = this.addDeviceAvailability(
-            device3,
-            account1,
-            "Comment from user3 on device1",
-            "67655",
-            "TUM",
-            "Informatik"
-        );
-
-        DeviceAvailability availabilityDevice3Account4 = this.addDeviceAvailability(
-            device3,
-            account4,
-            "Comment from user4 on device3",
-            "67655",
-            "TUM",
-            "Chemistry"
-        );
-
     }
 
     private Account createAccount(
@@ -148,9 +166,13 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
     private WikiPage createDevice(
         String title,
         String description,
-        String references
+        String references,
+        Media media
     ) {
         WikiPage device = new WikiPage(PageType.DEVICE, title, description, references);
+        if (media != null) {
+            device.setMedia(media);
+        }
         return this.wikiPageRepository.save(device);
     }
 
@@ -172,5 +194,10 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
             owner
         );
         return this.deviceAvailabilityRepository.save(availability);
+    }
+
+    private Media addMedia(String name, String mimeType) {
+        Media media = new Media(mimeType, name);
+        return this.mediaRepository.save(media);
     }
 }
