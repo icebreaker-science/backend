@@ -65,7 +65,7 @@ public class ApplicationRunnerSeeder implements ApplicationRunner {
         String newLine = System.getProperty("line.separator");
 
         Account account1 = this.createAccount("Guy", "Person",
-            "guy@test.com", "securepassword", "Dr.", "TUM", "Chemistry", "Munich");
+            "testguyperson@icebreaker.science", "securepassword", "Dr.", "TUM", "Chemistry", "Munich");
 
         Media device1Media = addMedia("image", "image/jpeg");
         Media device2Media = addMedia("image", "image/png");
