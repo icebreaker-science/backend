@@ -3,14 +3,14 @@ package science.icebreaker.data.network;
 
 public class Node {
 
+    private int id;
+
     private String name;
 
-    private int weight;
 
-
-    public Node(String name, int weight) {
+    public Node(int id, String name) {
+        this.id = id;
         this.name = name;
-        this.weight = weight;
     }
 
 
@@ -24,14 +24,11 @@ public class Node {
         return this;
     }
 
-
-    public int getWeight() {
-        return weight;
+    public int getId() {
+        return id;
     }
 
-
-    public Node setWeight(int weight) {
-        this.weight = weight;
-        return this;
+    public void setId(int id) {
+        this.id = id;
     }
 }

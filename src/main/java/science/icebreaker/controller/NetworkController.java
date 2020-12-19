@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import science.icebreaker.data.network.CategoryNode;
 import science.icebreaker.data.network.Edge;
-import science.icebreaker.data.network.Node;
+import science.icebreaker.data.network.KeywordNode;
 import science.icebreaker.dao.entity.Paper;
 import science.icebreaker.service.NetworkService;
 
@@ -38,9 +39,15 @@ public class NetworkController {
 
 
     @GetMapping("/node")
-    @ApiOperation("Returns all nodes")
-    public List<Node> getNodes() {
-        return service.getAllNodes();
+    @ApiOperation("Returns all keyword nodes")
+    public List<KeywordNode> getNodes() {
+        return service.getAllKeywordNodes();
+    }
+
+    @GetMapping("/categories")
+    @ApiOperation("Returns all category nodes")
+    public List<CategoryNode> getCategoryNodes() {
+        return service.getAllCategoryNodes();
     }
 
 
@@ -62,6 +69,16 @@ public class NetworkController {
             @RequestParam("nodes") String nodes
     ) {
         return service.getShortestPathGraph(Arrays.asList(nodes.split(",")));
+    }
+
+    @GetMapping("/graph/category")
+    @ApiOperation("Returns the edges between all categories or between all nodes of one category.")
+    public List<Edge> getCategoryGraph(@RequestParam(name = "category", required = false) String category) {
+        if (category != null) {
+            return service.getCategoryGraph(category);
+        } else {
+            return service.getCategoryGraph();
+        }
     }
 
 
