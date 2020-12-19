@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.transaction.annotation.Transactional;
 import science.icebreaker.controller.WikiController;
 import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.exception.EntryNotFoundException;
+import science.icebreaker.exception.IllegalRequestParameterException;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,5 +51,12 @@ class WikiControllerTest {
             WikiPage fail1 = new WikiPage(WikiPage.PageType.DEVICE, "title", "", null);
             wikiController.addWikiPage(fail1, null);
         }).isInstanceOf(ConstraintViolationException.class);
+
+        // non-existing network keyword
+        assertThatThrownBy(() -> {
+            WikiPage fail1 = new WikiPage(WikiPage.PageType.DEVICE, "title", "", null,
+                    Arrays.asList("thisisnotarealkeyword"), null);
+            wikiController.addWikiPage(fail1, null);
+        }).isInstanceOf(IllegalRequestParameterException.class);
     }
 }
