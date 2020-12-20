@@ -5,12 +5,15 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
+import org.neo4j.driver.Values;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import science.icebreaker.data.network.Edge;
-import science.icebreaker.data.network.Node;
 import science.icebreaker.dao.entity.Paper;
 import science.icebreaker.dao.repository.PaperRepository;
+import science.icebreaker.data.network.CategoryNode;
+import science.icebreaker.data.network.Edge;
+import science.icebreaker.data.network.KeywordEdge;
+import science.icebreaker.data.network.KeywordNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,12 +61,34 @@ public class NetworkService implements AutoCloseable {
     }
 
 
-    public List<Node> getAllNodes() {
+    public List<KeywordNode> getAllKeywordNodes() {
         try (Session session = driver.session()) {
-            Result result = session.run("match (n: Topic) return n.name, n.weight");
+            Result result = session.run("MATCH (n: Topic) - [e] - (m :Category) "
+                    + "RETURN ID(n) AS id, n.name AS name, n.weight AS weight, collect(m.name) AS categories "
+                    + "UNION "
+                    + "MATCH (n: Topic)  "
+                    + "WHERE NOT (n) - [:IS_CATEGORY] -() "
+                    + "RETURN ID(n) AS id, n.name AS name, n.weight AS weight, [\"others\"] AS categories;");
             return result.stream()
                     .map((record) ->
-                    new Node(record.get("n.name").asString(), record.get("n.weight").asInt()))
+                    new KeywordNode(record.get("id").asInt(),
+                            record.get("name").asString(),
+                            record.get("weight").asInt(),
+                            record.get("categories").asList(Values.ofString()).toArray(new String[0])))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public List<CategoryNode> getAllCategoryNodes() {
+        try (Session session = driver.session()) {
+            Result result = session.run("MATCH (n: Category) - [:IS_CATEGORY] - (m:Topic)"
+                    + "RETURN ID(n) AS id, n.name AS name, n.rank AS rank, count(m) AS weight");
+            return result.stream()
+                    .map((record) ->
+                            new CategoryNode(record.get("id").asInt(),
+                                    record.get("name").asString(),
+                                    record.get("rank").asInt(),
+                                    record.get("weight").asInt()))
                     .collect(Collectors.toList());
         }
     }
@@ -78,13 +103,13 @@ public class NetworkService implements AutoCloseable {
                             + "where (m1.name in ms or m1.name = n.name) "
                             + "and (m2.name in ms or m2.name = n.name) "
                             + "and m1.name < m2.name "
-                            + "return m1.name, m2.name, e.weight, e.normalizedWeight, e.references "
+                            + "return ID(m1) AS node1, ID(m2) as node2, e.weight, e.normalizedWeight, e.references "
                             + "limit " + MAX_RETURNED_EDGES,
                     parameters("name", nodeName));
             return result.stream()
-                    .map((record) -> new Edge(
-                            record.get("m1.name").asString(),
-                            record.get("m2.name").asString(),
+                    .map((record) -> new KeywordEdge(
+                            record.get("node1").asInt(),
+                            record.get("node2").asInt(),
                             record.get("e.weight").asInt(),
                             record.get("e.normalizedWeight").asDouble(),
                             record.get("e.references").asString()
@@ -104,16 +129,50 @@ public class NetworkService implements AutoCloseable {
                             + "match (n:Topic)-[e]-(m:Topic) "
                             + "where n in nodes_on_path and m in nodes_on_path "
                             + "and n.name < m.name "
-                            + "return n.name, m.name, e.weight, e.normalizedWeight, e.references "
+                            + "return ID(n) AS node1, ID(m) as node2, e.weight, e.normalizedWeight, e.references "
                             + "limit " + MAX_RETURNED_EDGES,
                     parameters("nodes", nodes));
             return result.stream()
-                    .map((record) -> new Edge(
-                            record.get("n.name").asString(),
-                            record.get("m.name").asString(),
+                    .map((record) -> new KeywordEdge(
+                            record.get("node1").asInt(),
+                            record.get("node2").asInt(),
                             record.get("e.weight").asInt(),
                             record.get("e.normalizedWeight").asDouble(),
                             record.get("e.references").asString()
+                    ))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public List<Edge> getCategoryGraph() {
+        try (Session session = driver.session()) {
+            Result result = session.run(
+                    "MATCH (n:Category) - [:IS_CATEGORY] - (t:Topic) - [:IS_CATEGORY] - (m:Category) "
+                            + "WHERE ID(n) < ID(m) "
+                            + "RETURN ID(n) AS node1, ID(m) AS node2, count(t) AS weight");
+            return result.stream()
+                    .map((record) -> new Edge(
+                            record.get("node1").asInt(),
+                            record.get("node2").asInt(),
+                            record.get("weight").asInt()
+                    ))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public List<Edge> getCategoryGraph(String category) {
+        try (Session session = driver.session()) {
+            Result result = session.run(
+                    "MATCH (c:Category) - [:IS_CATEGORY] - (n:Topic) - [r:RELATED_TO] - (m:Topic) "
+                            + "- [:IS_CATEGORY] - (c:Category) "
+                            + "WHERE ID(n) < ID(m) AND c.name = $category "
+                            + "RETURN ID(n) AS node1, ID(m) AS node2, r.weight AS weight",
+                    parameters("category", category));
+            return result.stream()
+                    .map((record) -> new Edge(
+                            record.get("node1").asInt(),
+                            record.get("node2").asInt(),
+                            record.get("weight").asInt()
                     ))
                     .collect(Collectors.toList());
         }
