@@ -21,6 +21,7 @@ import science.icebreaker.service.MediaService;
 import science.icebreaker.service.NetworkService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -64,12 +65,16 @@ public class WikiController {
         Set<String> existingKeywords
                 = networkService.getAllKeywordNodes().stream().map(Node::getName).collect(Collectors.toSet());
         if (wikiPage.getNetworkKeywords() != null) {
+            List<String> nonExistingKeywords = new ArrayList<>();
             for (String networkKeyword : wikiPage.getNetworkKeywords()) {
                 if (!existingKeywords.contains(networkKeyword)) {
-                    throw new IllegalRequestParameterException()
-                            .withErrorCode(ErrorCodeEnum.ERR_WIKI_003)
-                            .withArgs(networkKeyword);
+                    nonExistingKeywords.add(networkKeyword);
                 }
+            }
+            if (!nonExistingKeywords.isEmpty()) {
+                throw new IllegalRequestParameterException()
+                        .withErrorCode(ErrorCodeEnum.ERR_WIKI_003)
+                        .withArgs(String.join(",", nonExistingKeywords));
             }
         }
 
