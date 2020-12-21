@@ -3,16 +3,6 @@ package science.icebreaker.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import science.icebreaker.exception.ErrorCodeEnum;
-import science.icebreaker.exception.IllegalRequestParameterException;
-
-import science.icebreaker.exception.EntryNotFoundException;
-import science.icebreaker.dao.entity.Media;
-import science.icebreaker.service.MediaService;
-
-import javax.validation.Valid;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,21 +10,39 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import science.icebreaker.dao.entity.Media;
 import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.dao.repository.WikiPageRepository;
+import science.icebreaker.data.network.Node;
+import science.icebreaker.exception.EntryNotFoundException;
+import science.icebreaker.exception.ErrorCodeEnum;
+import science.icebreaker.exception.IllegalRequestParameterException;
+import science.icebreaker.service.MediaService;
+import science.icebreaker.service.NetworkService;
 
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class WikiController {
 
     private final WikiPageRepository wikiPageRepository;
     private final MediaService mediaService;
+    private final NetworkService networkService;
 
-    public WikiController(WikiPageRepository wikiPageRepository, MediaService mediaService) {
+
+    public WikiController(
+            WikiPageRepository wikiPageRepository,
+            MediaService mediaService,
+            NetworkService networkService
+    ) {
         this.wikiPageRepository = wikiPageRepository;
         this.mediaService = mediaService;
+        this.networkService = networkService;
     }
 
     @PostMapping("/wiki")
@@ -51,6 +59,23 @@ public class WikiController {
         if (wikiPage.getId() != 0) {
             throw new IllegalRequestParameterException()
                     .withErrorCode(ErrorCodeEnum.ERR_WIKI_001);
+        }
+
+        // Check if the referenced keywords exist
+        Set<String> existingKeywords
+                = networkService.getAllKeywordNodes().stream().map(Node::getName).collect(Collectors.toSet());
+        if (wikiPage.getNetworkKeywords() != null) {
+            List<String> nonExistingKeywords = new ArrayList<>();
+            for (String networkKeyword : wikiPage.getNetworkKeywords()) {
+                if (!existingKeywords.contains(networkKeyword)) {
+                    nonExistingKeywords.add(networkKeyword);
+                }
+            }
+            if (!nonExistingKeywords.isEmpty()) {
+                throw new IllegalRequestParameterException()
+                        .withErrorCode(ErrorCodeEnum.ERR_WIKI_003)
+                        .withArgs(String.join(",", nonExistingKeywords));
+            }
         }
 
         if (image != null) {

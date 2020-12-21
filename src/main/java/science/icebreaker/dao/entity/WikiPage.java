@@ -2,22 +2,25 @@ package science.icebreaker.dao.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -46,6 +49,12 @@ public class WikiPage {
     @Column(name = "reference") // references is a reserved key word
     private String references;
 
+    @NotNull
+    @ElementCollection
+    @CollectionTable(name = "wiki_page_network_keyword", joinColumns = @JoinColumn(name = "wiki_page_id"))
+    @Column(name = "network_keyword")
+    private List<String> networkKeywords;
+
     @OneToOne
     private Media media;
 
@@ -58,7 +67,7 @@ public class WikiPage {
         @NotNull @NotBlank String description,
         @Nullable String references
     ) {
-        this(type, title, description, references, null);
+        this(type, title, description, references, new ArrayList<>(), null);
     }
 
     public WikiPage(
@@ -66,12 +75,14 @@ public class WikiPage {
         @NotNull @NotBlank String title,
         @NotNull @NotBlank String description,
         @Nullable String references,
+        @NotNull List<String> networkKeywords,
         @Nullable Media media
     ) {
         this.type = type;
         this.title = title;
         this.description = description;
         this.references = references;
+        this.networkKeywords = networkKeywords;
         this.media = media;
     }
 
@@ -116,6 +127,14 @@ public class WikiPage {
         this.references = references;
     }
 
+    public List<String> getNetworkKeywords() {
+        return networkKeywords;
+    }
+
+    public void setNetworkKeywords(List<String> networkKeywords) {
+        this.networkKeywords = networkKeywords;
+    }
+
     public Media getMedia() {
         return media;
     }
@@ -137,12 +156,13 @@ public class WikiPage {
                 && type == wikiPage.type
                 && title.equals(wikiPage.title)
                 && description.equals(wikiPage.description)
-                && Objects.equals(references, wikiPage.references);
+                && Objects.equals(references, wikiPage.references)
+                && Objects.equals(networkKeywords, wikiPage.networkKeywords);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, title, description, references);
+        return Objects.hash(id, type, title, description, references, networkKeywords);
     }
 
     public enum PageType {
