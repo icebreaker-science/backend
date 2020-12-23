@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(Lifecycle.PER_METHOD)
-public class UserAccountCreation {
+public class UserAccountCreationTest {
 
     @Autowired
     private MockMvc mockMvc;

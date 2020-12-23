@@ -15,6 +15,8 @@ public class AddDeviceAvailabilityRequest {
     private String institution;
     private String researchGroup;
 
+    public AddDeviceAvailabilityRequest() { }
+
     public AddDeviceAvailabilityRequest(
         Integer deviceId,
         String comment,
