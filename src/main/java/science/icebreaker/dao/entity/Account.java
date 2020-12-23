@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 public class Account implements Principal {
@@ -104,6 +106,7 @@ public class Account implements Principal {
 
     @Override
     @ApiModelProperty(hidden = true)
+    @JsonIgnore
     public String getName() {
         return email;
     }

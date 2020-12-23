@@ -8,7 +8,7 @@ public class RegistrationRequestMock {
 
     public static RegistrationRequest createRegistrationRequest() {
         RegistrationRequest request = new RegistrationRequest();
-        Account account = new Account(null, "a.friend@icebreaker.science", "frosty");
+        Account account = new Account(null, "a.friend@icebreaker.science", "frosty1234");
         AccountProfile accountProfile = new AccountProfile();
         accountProfile.setForename("A");
         accountProfile.setSurname("Friend");
@@ -18,7 +18,7 @@ public class RegistrationRequestMock {
 
         request.setAccount(account);
         request.setProfile(accountProfile);
-        request.setCaptcha("captcha-token");
+        request.setCaptcha("10000000-aaaa-bbbb-cccc-000000000001");
         return request;
     }
 
@@ -34,7 +34,7 @@ public class RegistrationRequestMock {
 
         request.setAccount(account);
         request.setProfile(accountProfile);
-        request.setCaptcha("captcha-token");
+        request.setCaptcha("10000000-aaaa-bbbb-cccc-000000000001");
         return request;
     }
 

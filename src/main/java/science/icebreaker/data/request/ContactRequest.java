@@ -11,19 +11,21 @@ public class ContactRequest {
 
     @NotNull
     @NotBlank
-    private final String name;
+    private String name;
 
     @Email
     @NotNull
-    private final String email;
+    private String email;
 
     @NotNull
     @NotBlank
-    private final String message;
+    private String message;
 
     @Nullable
     @ApiModelProperty(value = "HCaptcha token. Required, if user is not authenticated.")
-    private final String captcha;
+    private String captcha;
+
+    public ContactRequest() { }
 
     public ContactRequest(
             @NotNull @NotBlank String name,
