@@ -1,4 +1,4 @@
-Dear [(${#strings.isEmpty(accountProfile.title) ? '' : accountProfile.title + ' '})][(${accountProfile.surname})],
+Dear [(${accountProfile.forename})],
 
 A request was registered for a device you offered via Icebreaker.science.
 

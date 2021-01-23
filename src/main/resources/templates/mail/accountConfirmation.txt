@@ -1,4 +1,4 @@
-Dear [(${#strings.isEmpty(title) ? '' : title + ' '})][(${surname})],
+Dear [(${forename})],
 
 To confirm your account, please click here :
 [(${hostUrl})]/validate-email?key=[(${confirmationToken})]
