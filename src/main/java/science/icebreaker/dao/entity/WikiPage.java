@@ -12,6 +12,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -57,6 +58,14 @@ public class WikiPage {
 
     @OneToOne
     private Media media;
+
+    @JoinColumn(name = "last_altered_by")
+    @OneToOne(targetEntity = Account.class, fetch = FetchType.LAZY)
+    private Account lastAlteredBy;
+
+    // If an account is deleted, keep the name of the editor
+    @Column(name = "last_altered_by_name")
+    private String lastAlteredByName;
 
     public WikiPage() {
     }
@@ -141,6 +150,22 @@ public class WikiPage {
 
     public void setMedia(Media media) {
         this.media = media;
+    }
+
+    public Account getLastAlteredBy() {
+        return lastAlteredBy;
+    }
+
+    public void setLastAlteredBy(Account lastAlteredBy) {
+        this.lastAlteredBy = lastAlteredBy;
+    }
+
+    public String getLastAlteredByName() {
+        return lastAlteredByName;
+    }
+
+    public void setLastAlteredByName(String lastAlteredByName) {
+        this.lastAlteredByName = lastAlteredByName;
     }
 
     @Override

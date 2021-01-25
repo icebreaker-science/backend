@@ -1,5 +1,7 @@
 package science.icebreaker.config;
 
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,5 +48,12 @@ public class WebConfig {
                 }
             }
         };
+    }
+
+    @Bean
+    // Prevents lazy loading of entities
+    // in controllers which could potentially leak sensitive data
+    public Hibernate5Module hibernate5Module() {
+        return new Hibernate5Module();
     }
 }
