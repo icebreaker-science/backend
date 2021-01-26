@@ -23,6 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation "io.springfox:springfox-boot-starter:3.0.0"
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5:2.9.0'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     runtimeOnly 'com.h2database:h2'
 

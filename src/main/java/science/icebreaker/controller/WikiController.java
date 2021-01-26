@@ -3,24 +3,31 @@ package science.icebreaker.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.Media;
 import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.dao.repository.WikiPageRepository;
 import science.icebreaker.data.network.Node;
+import science.icebreaker.data.request.EditWikiPageRequest;
 import science.icebreaker.exception.EntryNotFoundException;
 import science.icebreaker.exception.ErrorCodeEnum;
 import science.icebreaker.exception.IllegalRequestParameterException;
 import science.icebreaker.service.MediaService;
 import science.icebreaker.service.NetworkService;
+import science.icebreaker.service.WikiPageService;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,16 +40,18 @@ public class WikiController {
     private final WikiPageRepository wikiPageRepository;
     private final MediaService mediaService;
     private final NetworkService networkService;
-
+    private final WikiPageService wikiPageService;
 
     public WikiController(
             WikiPageRepository wikiPageRepository,
             MediaService mediaService,
-            NetworkService networkService
+            NetworkService networkService,
+            WikiPageService wikiPageService
     ) {
         this.wikiPageRepository = wikiPageRepository;
         this.mediaService = mediaService;
         this.networkService = networkService;
+        this.wikiPageService = wikiPageService;
     }
 
     @PostMapping("/wiki")
@@ -112,7 +121,19 @@ public class WikiController {
                 .withArgs(id);
         }
     }
+
+    @PutMapping("/wiki/{id}")
+    @ApiOperation("Edit wiki page")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Entry edited"),
+        @ApiResponse(code = 404, message = "Wiki page entry not found")
+    })
+    public void editWikiPage(
+        @PathVariable Integer id,
+        @RequestBody @Valid EditWikiPageRequest editWikiPageRequest,
+        Principal principal
+    ) {
+        Account account = (Account) ((Authentication) principal).getPrincipal();
+        this.wikiPageService.editWikiPage(id, editWikiPageRequest, account);
+    }
 }
-
-
-
