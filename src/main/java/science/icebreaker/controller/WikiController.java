@@ -112,9 +112,12 @@ public class WikiController {
         @ApiResponse(code = 404, message = "Wiki page entry not found")
     })
     public WikiPage getWikiPage(@PathVariable Integer id) throws EntryNotFoundException {
-        Optional<WikiPage> wikiPage = wikiPageRepository.findById(id);
-        if (wikiPage.isPresent()) {
-            return wikiPage.get();
+        Optional<WikiPage> wikiPageOpt = wikiPageRepository.findById(id);
+        if (wikiPageOpt.isPresent()) {
+            WikiPage wikiPage = wikiPageOpt.get();
+            // Explicitly load lazy objects (see https://stackoverflow.com/a/15360333/8376759)
+            wikiPage.getNetworkKeywords().size();
+            return wikiPage;
         } else {
             throw new EntryNotFoundException()
                 .withErrorCode(ErrorCodeEnum.ERR_WIKI_002)
