@@ -1,29 +1,31 @@
 package science.icebreaker.device_availability;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import science.icebreaker.data.request.ContactRequest;
 import science.icebreaker.controller.DeviceAvailabilityController;
 import science.icebreaker.dao.entity.Account;
 import science.icebreaker.dao.entity.DeviceAvailability;
+import science.icebreaker.dao.entity.WikiPage;
 import science.icebreaker.dao.repository.DeviceAvailabilityRepository;
-import science.icebreaker.exception.*;
+import science.icebreaker.data.request.ContactRequest;
+import science.icebreaker.exception.DeviceAvailabilityCreationException;
+import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
+import science.icebreaker.exception.EntryNotFoundException;
+import science.icebreaker.exception.MailException;
 import science.icebreaker.service.DeviceAvailabilityService;
 import science.icebreaker.util.TestHelper;
-import science.icebreaker.dao.entity.WikiPage;
-import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.Optional;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -133,35 +135,25 @@ public class DeviceAvailabilityServiceTest {
     @Test
     public void sendContactRequest_prepare_mail_success() throws MailException {
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
-        this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest, null);
+        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
+        this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest);
     }
 
     @Test
     public void sendContactRequest_device_not_exist() {
         testHelper.mockCaptcha(true);
         assertThatThrownBy(() -> {
-            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
-            this.deviceAvailabilityController.sendContactRequest(-1, contactRequest, null);
+            ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message");
+            this.deviceAvailabilityController.sendContactRequest(-1, contactRequest);
         }).isInstanceOf(DeviceAvailabilityNotFoundException.class);
     }
 
     @Test
     public void sendContactRequest_request_not_valid() {
         assertThatThrownBy(() -> {
-            ContactRequest contactRequest = new ContactRequest("A", "email.icebreaker.science", "message", "captcha");
-            this.deviceAvailabilityController.sendContactRequest(1, contactRequest, null);
+            ContactRequest contactRequest = new ContactRequest("A", "email.icebreaker.science", "message");
+            this.deviceAvailabilityController.sendContactRequest(1, contactRequest);
         }).isInstanceOf(ConstraintViolationException.class);
-    }
-
-    @Test
-    public void sendContactRequest_captcha_not_valid() {
-        DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        testHelper.mockCaptcha(false);
-        ContactRequest contactRequest = new ContactRequest("A", "email@icebreaker.science", "message", "captcha");
-        assertThatThrownBy(() -> {
-            this.deviceAvailabilityController.sendContactRequest(deviceAvailability.getId(), contactRequest, null);
-        }).isInstanceOf(CaptchaInvalidException.class);
     }
 
     @Test
@@ -236,7 +228,7 @@ public class DeviceAvailabilityServiceTest {
         final String newInstitution = "new inst";
         final String newPostalCode = "88888";
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        
+
         deviceAvailabilityService.updateDeviceAvailability(
                 deviceAvailability.getId(),
                 deviceAvailability.getAccount(),
@@ -256,14 +248,14 @@ public class DeviceAvailabilityServiceTest {
     @Test
     public void updateDeviceAvailability_disable_and_find_success() {
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        
+
         deviceAvailabilityService.updateDeviceAvailability(
                 deviceAvailability.getId(),
                 deviceAvailability.getAccount(),
                 null,
                 null,
                 null,
-                null, 
+                null,
                 true
         );
 
@@ -277,11 +269,11 @@ public class DeviceAvailabilityServiceTest {
                 null,
                 null,
                 null,
-                null, 
+                null,
                 false
         );
 
-        DeviceAvailability foundAvailability = 
+        DeviceAvailability foundAvailability =
             deviceAvailabilityService.getDeviceAvailability(deviceAvailability.getId());
 
         assertThat(foundAvailability).isNotNull();
@@ -290,14 +282,14 @@ public class DeviceAvailabilityServiceTest {
     @Test
     public void updateDeviceAvailability_disable_and_find_list_success() {
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        
+
         deviceAvailabilityService.updateDeviceAvailability(
                 deviceAvailability.getId(),
                 deviceAvailability.getAccount(),
                 null,
                 null,
                 null,
-                null, 
+                null,
                 true
         );
 
@@ -312,7 +304,7 @@ public class DeviceAvailabilityServiceTest {
                 null,
                 null,
                 null,
-                null, 
+                null,
                 false
         );
 
@@ -325,14 +317,14 @@ public class DeviceAvailabilityServiceTest {
     @Test
     public void updateDeviceAvailability_set_disabled_and_get_own_entries_success() {
         DeviceAvailability deviceAvailability = testHelper.createDeviceAvailability();
-        
+
         deviceAvailabilityService.updateDeviceAvailability(
                 deviceAvailability.getId(),
                 deviceAvailability.getAccount(),
                 null,
                 null,
                 null,
-                null, 
+                null,
                 true
         );
 
