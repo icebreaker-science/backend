@@ -105,7 +105,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,
                     "/wiki",
                     "/device-availability/",
-                    "/wiki/{\\d+}"
+                    "/wiki/{\\d+}",
+                    "/profile/{\\d+}"
                 ).permitAll()
                 .antMatchers(HttpMethod.PUT,
                     "/account/forgot-password"
