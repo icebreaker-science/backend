@@ -99,8 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/internal/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.POST,
-                    "/account/reset-password",
-                    "/device-availability/{id:[0-9]+}/contact"
+                    "/account/reset-password"
                 ).permitAll()
                 .antMatchers(HttpMethod.GET,
                     "/wiki",

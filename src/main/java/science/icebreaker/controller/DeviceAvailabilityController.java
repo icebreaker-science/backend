@@ -4,8 +4,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import org.springframework.lang.Nullable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,34 +19,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.Principal;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
+import science.icebreaker.dao.entity.Account;
+import science.icebreaker.dao.entity.DeviceAvailability;
 import science.icebreaker.data.request.AddDeviceAvailabilityRequest;
 import science.icebreaker.data.request.ContactRequest;
 import science.icebreaker.data.request.UpdateDeviceAvailabilityRequest;
 import science.icebreaker.data.response.GetDeviceAvailabilityResponse;
-import science.icebreaker.dao.entity.Account;
-import science.icebreaker.dao.entity.DeviceAvailability;
 import science.icebreaker.exception.AccountNotFoundException;
-import science.icebreaker.exception.CaptchaInvalidException;
 import science.icebreaker.exception.DeviceAvailabilityCreationException;
 import science.icebreaker.exception.DeviceAvailabilityNotFoundException;
 import science.icebreaker.exception.MailException;
 import science.icebreaker.service.CaptchaService;
-import science.icebreaker.validation.controllerValidators.HasFiltersConstraint;
-import science.icebreaker.service.MailService;
 import science.icebreaker.service.DeviceAvailabilityService;
+import science.icebreaker.service.MailService;
+import science.icebreaker.validation.controllerValidators.HasFiltersConstraint;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.Valid;
+import java.security.Principal;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -127,13 +122,8 @@ public class DeviceAvailabilityController {
             @ApiResponse(code = 400, message = "Device availability does not exist")})
     public void sendContactRequest(
             @PathVariable int id,
-            @RequestBody @Valid ContactRequest contactRequest,
-            @ApiIgnore @Nullable UsernamePasswordAuthenticationToken principal
-    ) throws AccountNotFoundException, DeviceAvailabilityNotFoundException, MailException, CaptchaInvalidException {
-        if (principal == null || !principal.isAuthenticated()) {
-            captchaService.verifyCaptcha(contactRequest.getCaptcha());
-        }
-
+            @RequestBody @Valid ContactRequest contactRequest
+    ) throws AccountNotFoundException, DeviceAvailabilityNotFoundException, MailException {
         DeviceAvailability deviceAvailability = service.getDeviceAvailability(id);
         mailService.sendContactRequestMail(contactRequest, deviceAvailability.getAccount());
     }
