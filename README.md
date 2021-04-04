@@ -1,8 +1,11 @@
 # Icebreaker Backend
 
-The default port is `9090`. Open `http://localhost:9090` to find a welcome message and navigate to `http://localhost:9090/swagger-ui/` for the Swagger UI.
+This repository contains the code for the backend server of icebreaker.science.
 
-## Setup
+
+## Development
+
+The default port is `9090`. Open `http://localhost:9090` to find a welcome message and navigate to `http://localhost:9090/swagger-ui/` for the Swagger UI.
 
 **Requirements**
 
