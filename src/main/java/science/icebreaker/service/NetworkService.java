@@ -15,6 +15,8 @@ import science.icebreaker.data.network.Edge;
 import science.icebreaker.data.network.KeywordEdge;
 import science.icebreaker.data.network.KeywordNode;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,8 +50,14 @@ public class NetworkService implements AutoCloseable {
             PaperRepository paperRepository
     ) {
         this.paperRepository = paperRepository;
-        driver = GraphDatabase.driver(
-            "bolt://" + host + ":" + port, AuthTokens.basic(username, password));
+        // Manually resolving the address because docker-internal, abbreviated host names are not accepted.
+        try {
+            String hostAddress = InetAddress.getByName(host).getHostAddress();
+            driver = GraphDatabase.driver(
+                    "bolt://" + hostAddress + ":" + port, AuthTokens.basic(username, password));
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Cannot resolve address of the Neo4j server?", e);
+        }
     }
 
 
